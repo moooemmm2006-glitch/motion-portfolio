@@ -18,7 +18,7 @@ export const site = {
   email: 'hello@example.com',
   whatsapp: '+201117651679',
   phoneDisplay: '0111 765 1679',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://motion-portfolio-umber.vercel.app',
   portrait: '/images/portrait.jpg',
   showreel: {
     type: 'file',
