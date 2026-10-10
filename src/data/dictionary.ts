@@ -19,9 +19,8 @@ export const en = {
   contact: {
     eyebrow: 'Contact',
     heading: "Let's make something that moves.",
-    sent: 'Message sent. I will reply within 24 hours.',
-    error: 'Something went wrong. Please message me on WhatsApp instead.',
-    submit: 'Send message',
+    sent: 'Opening WhatsApp. Just hit send there.',
+    submit: 'Send on WhatsApp',
     sending: 'Rendering…',
   },
   footer: { top: 'Rewind to top', rights: 'All rights reserved.' },

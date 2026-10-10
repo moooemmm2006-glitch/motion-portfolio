@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { site } from '@/data/site';
+import { site, whatsappUrl } from '@/data/site';
 import { t } from '@/data/dictionary';
 import { budgets, contactSchema, projectTypes, type ContactInput } from '@/lib/contact-schema';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
@@ -14,7 +14,7 @@ import { Magnetic } from '@/components/ui/Magnetic';
 import { SplitText } from '@/components/ui/SplitText';
 import { expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
-import { SocialIcons, WhatsAppLink } from '@/components/ui/Brand';
+import { SocialIcons, WhatsAppIcon, WhatsAppLink } from '@/components/ui/Brand';
 
 const ContactScene = dynamic(() => import('@/components/three/ContactScene'), { ssr: false });
 
@@ -50,7 +50,7 @@ export function Contact() {
   const can3D = useCanUse3D();
   const section = useRef<HTMLElement>(null);
   const near = useInView(section, '200px');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
   const {
     register,
     handleSubmit,
@@ -58,20 +58,21 @@ export function Contact() {
     formState: { errors },
   } = useForm<ContactInput>({ resolver: zodResolver(contactSchema) });
 
-  const onSubmit = async (data: ContactInput) => {
-    setStatus('sending');
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error();
-      setStatus('sent');
-      reset();
-    } catch {
-      setStatus('error');
-    }
+  // The form hands everything to WhatsApp as one prefilled message.
+  const onSubmit = (data: ContactInput) => {
+    const text = [
+      `Hi Ahmed, I'm ${data.name}.`,
+      `Email: ${data.email}`,
+      `Project type: ${data.projectType}`,
+      `Budget: ${data.budget}`,
+      '',
+      data.message,
+    ].join('\n');
+    const url = whatsappUrl(text);
+    const win = window.open(url, '_blank', 'noopener');
+    if (!win) window.location.href = url;
+    setStatus('sent');
+    reset();
   };
 
 
@@ -162,13 +163,15 @@ export function Contact() {
                       transition={{ duration: 3, ease: 'easeOut' }}
                     />
                   )}
-                  <span className="relative">{status === 'sending' ? t.contact.sending : t.contact.submit} →</span>
+                  <span className="relative inline-flex items-center gap-2">
+                    <WhatsAppIcon className="text-[#25D366]" />
+                    {status === 'sending' ? t.contact.sending : t.contact.submit} →
+                  </span>
                 </button>
               </Magnetic>
               <p role="status" className="text-sm">
                 {status === 'sent' && <span className="text-violet-soft">{t.contact.sent}</span>}
-                {status === 'error' && <span className="text-ember">{t.contact.error}</span>}
-              </p>
+                              </p>
             </div>
           </motion.form>
         </div>

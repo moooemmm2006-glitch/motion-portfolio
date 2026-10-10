@@ -88,6 +88,7 @@ function NativePlayer({ source, title, autoPlay, className, startMuted, onEnded,
       destroy = () => hls.destroy();
     });
     return () => destroy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload only when the source changes
   }, [source]);
 
   // Pause when scrolled out of view.
