@@ -6,19 +6,22 @@ import { useEffect, useRef, useState } from 'react';
 import { projects } from '@/data/projects';
 import { useUI } from '@/components/providers/UIProvider';
 import { useLenis } from '@/components/providers/SmoothScroll';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import { cineInOut } from '@/lib/easing';
 import { VideoPlayer } from './VideoPlayer';
 
 export function ShowreelModal() {
   const { showreelOpen, closeShowreel } = useUI();
   const lenis = useLenis();
+  const { t } = useLang();
+  const { project: localize } = useContent();
   const closeRef = useRef<HTMLButtonElement>(null);
   // "Show videos" plays every project back to back, starting from the first.
   const [current, setCurrent] = useState(0);
   const [muted, setMuted] = useState(true);
   const count = projects.length;
   const go = (i: number) => setCurrent((i + count) % count);
-  const project = projects[current];
+  const project = localize(projects[current]);
 
   useEffect(() => {
     if (showreelOpen) setCurrent(0);
@@ -48,7 +51,7 @@ export function ShowreelModal() {
         <motion.div
           role="dialog"
           aria-modal="true"
-          aria-label="Videos"
+          aria-label={t.video.all}
           className="fixed inset-0 z-[90] flex items-center justify-center bg-black/95 p-4 md:p-10"
           initial={{ clipPath: 'inset(50% 0 50% 0)' }}
           animate={{ clipPath: 'inset(0% 0 0% 0)' }}
@@ -80,14 +83,14 @@ export function ShowreelModal() {
                 <span className="font-mono text-xs text-violet-soft">
                   {String(current + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
                 </span>
-                <span className="ml-3 text-paper">{project.title}</span>
-                <span className="ml-2 hidden text-paper/50 sm:inline">· {project.client}</span>
+                <span className="ms-3 text-paper">{project.title}</span>
+                <span className="ms-2 hidden text-paper/50 sm:inline">· {project.client}</span>
               </p>
               <button onClick={() => go(current - 1)} className="btn-ghost px-4 py-2 font-mono text-xs" aria-label="Previous video">
-                ← PREV
+                {t.video.prev}
               </button>
               <button onClick={() => go(current + 1)} className="btn-ghost px-4 py-2 font-mono text-xs" aria-label="Next video">
-                NEXT →
+                {t.video.next}
               </button>
             </div>
             <ul className="mt-3 grid grid-cols-5 gap-2 md:gap-3">
@@ -110,10 +113,10 @@ export function ShowreelModal() {
           <button
             ref={closeRef}
             onClick={closeShowreel}
-            className="btn-ghost absolute right-4 top-4 font-mono text-xs md:right-8 md:top-8"
+            className="btn-ghost absolute end-4 top-4 font-mono text-xs md:end-8 md:top-8"
             data-cursor="CLOSE"
           >
-            ESC · CLOSE
+            {t.video.close}
           </button>
         </motion.div>
       )}

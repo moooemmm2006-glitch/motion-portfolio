@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { nav, site } from '@/data/site';
-import { t } from '@/data/dictionary';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import { useScrollTo } from '@/components/providers/SmoothScroll';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
@@ -11,6 +11,8 @@ import { SocialIcons, WhatsAppLink } from './Brand';
 
 export function Footer() {
   const scrollTo = useScrollTo();
+  const { t } = useLang();
+  const { profile } = useContent();
   const [rewinding, setRewinding] = useState(false);
 
   return (
@@ -20,24 +22,24 @@ export function Footer() {
           <div>
             <p className="display text-[clamp(2.5rem,6vw,5rem)]">{site.name}</p>
             <p className="mt-3 max-w-sm text-paper/60">
-              {site.title} · {site.specialty}
+              {profile.title} · {profile.specialty}
             </p>
             <WhatsAppLink className="mt-6 text-lg text-paper hover:text-[#25D366]" />
           </div>
           <nav aria-label="Footer">
-            <p className="eyebrow mb-4">Menu</p>
+            <p className="eyebrow mb-4">{t.footer.menu}</p>
             <ul className="space-y-2">
               {nav.map((n) => (
                 <li key={n.href}>
                   <TransitionLink href={n.href} className="text-paper/70 hover:text-paper">
-                    {n.label}
+                    {t.nav[n.href] ?? n.label}
                   </TransitionLink>
                 </li>
               ))}
             </ul>
           </nav>
           <div>
-            <p className="eyebrow mb-4">Connect</p>
+            <p className="eyebrow mb-4">{t.footer.connect}</p>
             <SocialIcons />
           </div>
         </div>

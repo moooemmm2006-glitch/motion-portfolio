@@ -3,8 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import type { Project } from '@/data/types';
-import { categoryLabel } from '@/data/categories';
-import { t } from '@/data/dictionary';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import { BeforeAfter } from '@/components/ui/BeforeAfter';
 import { Magnetic } from '@/components/ui/Magnetic';
 import { SplitText } from '@/components/ui/SplitText';
@@ -19,27 +18,33 @@ const reveal = {
   transition: { duration: 1.1, ease: expoOut },
 } as const;
 
-export function ProjectDetail({ project, prev, next }: { project: Project; prev: Project; next: Project }) {
+export function ProjectDetail(props: { project: Project; prev: Project; next: Project }) {
+  const { t, lang } = useLang();
+  const { categoryLabel, project: localize } = useContent();
+  const project = localize(props.project);
+  const prev = localize(props.prev);
+  const next = localize(props.next);
+  const sep = lang === 'ar' ? '، ' : ', ';
   const info: [string, string][] = [
-    ['Client', project.client],
-    ['Role', project.role],
-    ['Year', String(project.year)],
-    ['Duration', project.duration],
-    ['Tools', project.tools.join(', ')],
-    ['Deliverables', project.deliverables.join(', ')],
+    [t.project.info.client, project.client],
+    [t.project.info.role, project.role],
+    [t.project.info.year, String(project.year)],
+    [t.project.info.duration, project.duration],
+    [t.project.info.tools, project.tools.join(', ')],
+    [t.project.info.deliverables, project.deliverables.join(sep)],
   ];
 
   return (
     <article className="pb-20 pt-32 md:pt-40">
       <div className="container-x">
         <TransitionLink href="/#work" className="eyebrow inline-flex items-center gap-2 hover:text-paper" transitionLabel="Work">
-          ← {t.project.back}
+          {t.project.backArrow} {t.project.back}
         </TransitionLink>
         <p className="eyebrow mt-10 text-violet-soft">
           {categoryLabel(project.category)} · {project.year}
         </p>
         <h1 className="display mt-4 text-[clamp(3rem,12vw,11rem)]">
-          <SplitText text={project.title} by="chars" trigger="manual" play delay={0.3} />
+          <SplitText key={lang} text={project.title} by={lang === 'ar' ? 'words' : 'chars'} trigger="manual" play delay={0.3} />
         </h1>
         <p className="mt-6 max-w-2xl text-xl text-paper/70">{project.summary}</p>
       </div>
@@ -96,8 +101,8 @@ export function ProjectDetail({ project, prev, next }: { project: Project; prev:
       {/* Next / previous */}
       <nav className="container-x mt-32 grid gap-4 md:grid-cols-2" aria-label="More projects">
         {[
-          { p: prev, label: t.project.prev, align: 'text-left' },
-          { p: next, label: t.project.next, align: 'md:text-right' },
+          { p: prev, label: t.project.prev, align: 'text-start' },
+          { p: next, label: t.project.next, align: 'md:text-end' },
         ].map(({ p, label, align }) => (
           <TransitionLink
             key={label}
@@ -115,7 +120,7 @@ export function ProjectDetail({ project, prev, next }: { project: Project; prev:
       <div className="container-x mt-16 flex justify-center">
         <Magnetic>
           <TransitionLink href="/#contact" className="btn-primary px-8 py-4" transitionLabel="Contact">
-            Start a project →
+            {t.project.start} {t.contact.arrow}
           </TransitionLink>
         </Magnetic>
       </div>

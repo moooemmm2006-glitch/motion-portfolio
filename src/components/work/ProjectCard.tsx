@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import type { Project } from '@/data/types';
-import { categoryLabel } from '@/data/categories';
+import { useContent } from '@/components/providers/LangProvider';
 import { TransitionLink } from '@/components/ui/TransitionLink';
 import { expoOut } from '@/lib/easing';
 
 /** 2D card: poster by default, muted preview loads and plays only while hovered/focused. */
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const { categoryLabel } = useContent();
   const video = useRef<HTMLVideoElement>(null);
   const [src, setSrc] = useState<string | undefined>();
   const [playing, setPlaying] = useState(false);
@@ -61,7 +62,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
             style={{ opacity: playing ? 1 : 0 }}
             aria-hidden
           />
-          <span className="absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest backdrop-blur">
+          <span className="absolute start-3 top-3 rounded-full bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest backdrop-blur">
             {categoryLabel(project.category)}
           </span>
         </div>

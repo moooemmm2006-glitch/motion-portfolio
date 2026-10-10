@@ -1,12 +1,17 @@
 /**
- * UI strings live here so a second language (e.g. Arabic, RTL) can be added
- * by creating another dictionary with the same keys and switching `dir` on <html>.
+ * UI strings for both languages. Arabic mirrors the English keys exactly;
+ * <html dir> flips to rtl when Arabic is active (see LangProvider).
  */
 export const en = {
   locale: 'en',
   dir: 'ltr',
+  switchTo: 'العربية',
+  nav: { '/#work': 'Work', '/#about': 'About', '/#services': 'Services', '/#contact': 'Contact' } as Record<string, string>,
+  letsTalk: "Let's talk",
+  waGreeting: "Hi Ahmed, I'd like to talk about a project",
+  menu: { open: 'Open menu', close: 'Close menu' },
   hero: { play: 'Show videos', scroll: 'Scroll' },
-  about: { eyebrow: 'About', heading: 'Editor by trade. Animator by obsession.', tools: 'Toolkit' },
+  about: { eyebrow: 'About', heading: 'Editor by trade. Animator by obsession.', tools: 'Toolkit', mainTool: 'Main tool', portrait: 'Portrait of' },
   work: {
     eyebrow: 'Selected Work',
     heading: 'Frames that earned their place.',
@@ -14,18 +19,35 @@ export const en = {
     viewGrid: 'Grid',
     empty: 'No projects in this category yet.',
     dragHint: 'Drag or use the arrows to browse',
+    viewProject: 'View project',
+    prev: 'Previous project',
+    next: 'Next project',
   },
   services: { eyebrow: 'Services', heading: 'What I can make for you.' },
   contact: {
     eyebrow: 'Contact',
     heading: "Let's make something that moves.",
+    intro: 'Tell me about your project. I usually reply within 24 hours.',
     sent: 'Opening WhatsApp. Just hit send there.',
     submit: 'Send on WhatsApp',
     sending: 'Rendering…',
+    arrow: '→',
+    fields: { name: 'Name', email: 'Email', projectType: 'Project type', budget: 'Budget range', message: 'Message' },
+    placeholders: { name: 'Your name', email: 'you@company.com', select: 'Select…', message: 'What are we making? Timeline, references, deliverables…' },
+    errors: {
+      name: 'Please tell me your name',
+      email: 'That email looks off',
+      projectType: 'Pick a project type',
+      budget: 'Pick a budget range',
+      message: 'A little more detail helps (20+ characters)',
+    },
+    wa: { hi: "Hi Ahmed, I'm", email: 'Email', type: 'Project type', budget: 'Budget' },
   },
-  footer: { top: 'Rewind to top', rights: 'All rights reserved.' },
+  footer: { top: 'Rewind to top', rights: 'All rights reserved.', menu: 'Menu', connect: 'Connect' },
+  video: { all: 'Videos', prev: 'PREV', next: 'NEXT', close: 'ESC · CLOSE' },
   project: {
     back: 'All work',
+    backArrow: '←',
     challenge: 'The challenge',
     approach: 'The approach',
     result: 'The result',
@@ -33,8 +55,70 @@ export const en = {
     bts: 'Behind the scenes',
     next: 'Next project',
     prev: 'Previous project',
+    start: 'Start a project',
+    info: { client: 'Client', role: 'Role', year: 'Year', duration: 'Duration', tools: 'Tools', deliverables: 'Deliverables' },
   },
-} as const;
+};
 
 export type Dictionary = typeof en;
+
+export const ar: Dictionary = {
+  locale: 'ar',
+  dir: 'rtl',
+  switchTo: 'English',
+  nav: { '/#work': 'أعمالي', '/#about': 'نبذة عني', '/#services': 'الخدمات', '/#contact': 'تواصل معي' },
+  letsTalk: 'لنتحدث',
+  waGreeting: 'مرحباً أحمد، أود التحدث معك بخصوص مشروع',
+  menu: { open: 'فتح القائمة', close: 'إغلاق القائمة' },
+  hero: { play: 'شاهد الأعمال', scroll: 'مرّر' },
+  about: { eyebrow: 'نبذة عني', heading: 'مونتير بالمهنة، وصانع موشن بالشغف.', tools: 'أدواتي', mainTool: 'الأداة الأساسية', portrait: 'صورة' },
+  work: {
+    eyebrow: 'أعمال مختارة',
+    heading: 'كل فريم هنا يستحق مكانه.',
+    view3d: '3D',
+    viewGrid: 'شبكة',
+    empty: 'لا توجد مشاريع في هذا التصنيف بعد.',
+    dragHint: 'اسحب أو استخدم الأسهم للتصفح',
+    viewProject: 'عرض المشروع',
+    prev: 'المشروع السابق',
+    next: 'المشروع التالي',
+  },
+  services: { eyebrow: 'الخدمات', heading: 'ما الذي يمكنني صنعه لك.' },
+  contact: {
+    eyebrow: 'تواصل معي',
+    heading: 'لنصنع معاً شيئاً ينبض بالحركة.',
+    intro: 'أخبرني عن مشروعك، وعادةً ما أرد خلال 24 ساعة.',
+    sent: 'جارٍ فتح واتساب، فقط اضغط إرسال هناك.',
+    submit: 'أرسل عبر واتساب',
+    sending: 'جارٍ التجهيز…',
+    arrow: '←',
+    fields: { name: 'الاسم', email: 'البريد الإلكتروني', projectType: 'نوع المشروع', budget: 'الميزانية', message: 'الرسالة' },
+    placeholders: { name: 'اسمك', email: 'you@company.com', select: 'اختر…', message: 'ما الذي سنصنعه؟ الموعد، والمراجع، والمطلوب تسليمه…' },
+    errors: {
+      name: 'من فضلك اكتب اسمك',
+      email: 'البريد الإلكتروني غير صحيح',
+      projectType: 'اختر نوع المشروع',
+      budget: 'اختر الميزانية',
+      message: 'أضف تفاصيل أكثر قليلاً (20 حرفاً على الأقل)',
+    },
+    wa: { hi: 'مرحباً أحمد، أنا', email: 'البريد', type: 'نوع المشروع', budget: 'الميزانية' },
+  },
+  footer: { top: 'العودة للأعلى', rights: 'جميع الحقوق محفوظة.', menu: 'القائمة', connect: 'تواصل' },
+  video: { all: 'الأعمال', prev: 'السابق', next: 'التالي', close: 'إغلاق' },
+  project: {
+    back: 'كل الأعمال',
+    backArrow: '→',
+    challenge: 'التحدي',
+    approach: 'طريقة التنفيذ',
+    result: 'النتيجة',
+    beforeAfter: 'قبل وبعد',
+    bts: 'من الكواليس',
+    next: 'المشروع التالي',
+    prev: 'المشروع السابق',
+    start: 'ابدأ مشروعك',
+    info: { client: 'العميل', role: 'الدور', year: 'السنة', duration: 'المدة', tools: 'الأدوات', deliverables: 'المخرجات' },
+  },
+};
+
+/** English strings for server code (metadata, OG image). Client components use useLang(). */
 export const t = en;

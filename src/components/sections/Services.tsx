@@ -2,8 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { services } from '@/data/services';
-import { t } from '@/data/dictionary';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import type { Service } from '@/data/types';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { expoOut } from '@/lib/easing';
@@ -75,10 +74,12 @@ function ServiceCard({ service, i }: { service: Service; i: number }) {
 }
 
 export function Services() {
+  const { t, lang } = useLang();
+  const { services } = useContent();
   return (
     <section id="services" className="relative py-28 md:py-40" aria-labelledby="services-title">
       <div className="container-x">
-        <SectionHeading id="services-title" index="03" eyebrow={t.services.eyebrow} title={t.services.heading} />
+        <SectionHeading key={lang} id="services-title" index="03" eyebrow={t.services.eyebrow} title={t.services.heading} />
         {/* Six-column grid so a short last row (3 + 2) sits centered. */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {services.map((s, i) => (

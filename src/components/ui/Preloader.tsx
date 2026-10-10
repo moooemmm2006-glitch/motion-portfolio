@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { site } from '@/data/site';
 import { useUI } from '@/components/providers/UIProvider';
+import { useContent } from '@/components/providers/LangProvider';
 import { cineInOut, expoOut } from '@/lib/easing';
 
 /** Waits for fonts, the first video poster and the 3D chunk. */
@@ -21,6 +22,7 @@ const preload = () =>
 /** A quiet intro: the name rises in, a thin line draws underneath, then the curtain lifts. */
 export function Preloader() {
   const { setLoaded } = useUI();
+  const { profile } = useContent();
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function Preloader() {
               </motion.p>
             </div>
             <motion.span
-              className="mt-4 block h-px w-40 origin-left bg-accent-gradient"
+              className="mt-4 block h-px w-40 origin-left bg-accent-gradient rtl:origin-right"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 1.2, ease: cineInOut, delay: 0.3 }}
@@ -72,7 +74,7 @@ export function Preloader() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              {site.title}
+              {profile.title}
             </motion.p>
           </div>
         </motion.div>

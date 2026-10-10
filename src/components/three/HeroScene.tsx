@@ -14,6 +14,8 @@ interface Props {
   progress: MutableRefObject<number>;
   active: boolean;
   mobile: boolean;
+  /** Arabic layout: text sits on the right, so the button moves to the left. */
+  rtl?: boolean;
 }
 
 /** Phone tilt as -1..1 (Android gives it freely; iOS needs a permission tap, so it stays 0 there). */
@@ -103,7 +105,7 @@ function playGeometry() {
 /**
  * A single glass play button: the simplest possible sign for "video", lit from inside.
  */
-function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; mobile: boolean }) {
+function PlayButton({ progress, mobile, rtl }: { progress: MutableRefObject<number>; mobile: boolean; rtl?: boolean }) {
   const root = useRef<THREE.Group>(null);
   const button = useRef<THREE.Group>(null);
   const innerGlow = useRef<THREE.Mesh>(null);
@@ -119,7 +121,7 @@ function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; 
   const edgeColor = useMemo(() => new THREE.Color(LOOK.edge).multiplyScalar(1.6), []);
 
   const scale = small ? Math.min(0.5, viewport.width / 6) : Math.min(0.68, viewport.width / 14);
-  const baseX = small ? 0 : viewport.width * 0.31;
+  const baseX = small ? 0 : viewport.width * 0.31 * (rtl ? -1 : 1);
   const baseY = small ? viewport.height * 0.27 : 0;
 
   useFrame((state, delta) => {
@@ -185,7 +187,7 @@ function Rig() {
   return null;
 }
 
-export default function HeroScene({ progress, active, mobile }: Props) {
+export default function HeroScene({ progress, active, mobile, rtl }: Props) {
   const [quality, setQuality] = useState<Quality>(mobile ? 'low' : 'high');
 
   return (
@@ -208,7 +210,7 @@ export default function HeroScene({ progress, active, mobile }: Props) {
       </Environment>
 
       <Suspense fallback={null}>
-        <PlayButton progress={progress} mobile={mobile} />
+        <PlayButton progress={progress} mobile={mobile} rtl={rtl} />
       </Suspense>
 
       <Sparkles count={mobile ? 90 : 160} scale={[14, 8, 6]} size={mobile ? 2.5 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />

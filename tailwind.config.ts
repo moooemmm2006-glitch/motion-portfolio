@@ -16,9 +16,9 @@ const config: Config = {
         line: 'rgb(var(--color-line) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        display: ['var(--font-display)', 'var(--font-ar-display)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'var(--font-ar-sans)', 'system-ui', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'var(--font-ar-sans)', 'monospace'],
       },
       transitionTimingFunction: {
         // After Effects "Easy Ease" (33% influence) and stronger graph-editor curves

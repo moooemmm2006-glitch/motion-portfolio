@@ -57,9 +57,15 @@ export function SplitText({ text, as = 'span', className, pieceClassName, by = '
   const words = text.split(' ');
   const Tag = as as 'span';
   return (
-    <Tag ref={ref as React.RefObject<HTMLSpanElement>} className={cn('inline-block', className)} aria-label={text}>
+    <Tag
+      ref={ref as React.RefObject<HTMLSpanElement>}
+      // letter-by-letter text is Latin (names, titles): keep it LTR inside Arabic pages
+      dir={by === 'chars' ? 'ltr' : undefined}
+      className={cn('inline-block', by === 'chars' && 'rtl:text-right', className)}
+      aria-label={text}
+    >
       {words.map((word, wi) => (
-        <span key={wi} aria-hidden className="inline-block overflow-hidden pb-[0.08em] align-top">
+        <span key={wi} aria-hidden className="split-word inline-block overflow-hidden pb-[0.08em] align-top">
           {by === 'words' ? (
             <span data-split className={cn('inline-block will-change-transform', pieceClassName)}>
               {word}

@@ -19,7 +19,7 @@ export function Counter({ value, suffix = '', duration = 2.2 }: { value: number;
   }, [inView, value, duration]);
 
   return (
-    <span ref={ref} aria-label={`${value}${suffix}`}>
+    <span ref={ref} dir="ltr" aria-label={`${value}${suffix}`}>
       <span aria-hidden>
         {n}
         {suffix}

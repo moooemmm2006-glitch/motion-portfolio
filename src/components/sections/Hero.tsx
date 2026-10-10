@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { site } from '@/data/site';
-import { t } from '@/data/dictionary';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import { useUI } from '@/components/providers/UIProvider';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
 import { useIsMobile } from '@/hooks/useReducedMotion';
@@ -22,6 +22,8 @@ const HeroScene = dynamic(() => import('@/components/three/HeroScene'), { ssr: f
 
 export function Hero() {
   const { loaded, openShowreel } = useUI();
+  const { t, lang } = useLang();
+  const { profile } = useContent();
   const can3D = useCanUse3D();
   const mobile = useIsMobile();
   const section = useRef<HTMLElement>(null);
@@ -59,11 +61,11 @@ export function Hero() {
       {/* Background: 3D scene, or a static cinematic poster as fallback */}
       <div ref={canvasWrap} className="absolute inset-0">
         {can3D ? (
-          <HeroScene progress={progress} active={active} mobile={mobile} />
+          <HeroScene progress={progress} active={active} mobile={mobile} rtl={lang === 'ar'} />
         ) : (
           <div className="absolute inset-0">
             <Image src={site.showreel.poster ?? '/posters/ai-sales-roleplay.jpg'} alt="" fill priority sizes="100vw" className="object-cover opacity-50" />
-            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent rtl:bg-gradient-to-l" />
           </div>
         )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink to-transparent" />
@@ -77,15 +79,15 @@ export function Hero() {
           transition={{ duration: 1, ease: expoOut, delay: 0.1 }}
         >
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-ember" />
-          {site.availability}
+          {profile.availability}
         </motion.p>
 
         <h1 className="display max-w-[12ch] text-[clamp(3.5rem,11vw,11rem)]">
           <SplitText text={site.name} by="chars" trigger="manual" play={loaded} delay={0.15} className="block" />
         </h1>
         <p className="mt-4 max-w-xl font-display text-[clamp(1.25rem,2.4vw,2rem)] leading-tight tracking-tight">
-          <SplitText text={site.title} trigger="manual" play={loaded} delay={0.5} className="block" />
-          <SplitText text={`— ${site.specialty}`} trigger="manual" play={loaded} delay={0.65} pieceClassName="text-gradient" className="block" />
+          <SplitText key={lang} text={profile.title} trigger="manual" play={loaded} delay={0.5} className="block" />
+          <SplitText key={`${lang}-s`} text={`— ${profile.specialty}`} trigger="manual" play={loaded} delay={0.65} pieceClassName="text-gradient" className="block" />
         </p>
         <motion.p
           className="mt-6 max-w-md text-paper/60"
@@ -93,7 +95,7 @@ export function Hero() {
           animate={loaded ? { opacity: 1 } : {}}
           transition={{ delay: 1, duration: 1.2 }}
         >
-          {site.tagline}
+          {profile.tagline}
         </motion.p>
 
         <motion.div
@@ -104,7 +106,7 @@ export function Hero() {
         >
           <Magnetic>
             <button
-              className="btn-primary group py-4 pl-4 pr-7"
+              className="btn-primary group py-4 pe-7 ps-4"
               onClick={() => {
                 blip(520);
                 openShowreel();

@@ -3,11 +3,11 @@
 import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { site, whatsappUrl } from '@/data/site';
-import { t } from '@/data/dictionary';
-import { budgets, contactSchema, projectTypes, type ContactInput } from '@/lib/contact-schema';
+import { useContent, useLang } from '@/components/providers/LangProvider';
+import { budgets, makeContactSchema, projectTypes, type ContactInput } from '@/lib/contact-schema';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
 import { useInView } from '@/hooks/useInView';
 import { Magnetic } from '@/components/ui/Magnetic';
@@ -48,6 +48,9 @@ function Field({ label, error, children, id }: { label: string; error?: string; 
 
 export function Contact() {
   const can3D = useCanUse3D();
+  const { t, lang } = useLang();
+  const { profile, projectType: typeLabel, budget: budgetLabel } = useContent();
+  const schema = useMemo(() => makeContactSchema(t.contact.errors), [t]);
   const section = useRef<HTMLElement>(null);
   const near = useInView(section, '200px');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
@@ -56,15 +59,15 @@ export function Contact() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ContactInput>({ resolver: zodResolver(contactSchema) });
+  } = useForm<ContactInput>({ resolver: zodResolver(schema) });
 
   // The form hands everything to WhatsApp as one prefilled message.
   const onSubmit = (data: ContactInput) => {
     const text = [
-      `Hi Ahmed, I'm ${data.name}.`,
-      `Email: ${data.email}`,
-      `Project type: ${data.projectType}`,
-      `Budget: ${data.budget}`,
+      `${t.contact.wa.hi} ${data.name}.`,
+      `${t.contact.wa.email}: ${data.email}`,
+      `${t.contact.wa.type}: ${typeLabel(data.projectType)}`,
+      `${t.contact.wa.budget}: ${budgetLabel(data.budget)}`,
       '',
       data.message,
     ].join('\n');
@@ -89,17 +92,17 @@ export function Contact() {
       <div className="container-x">
         <p className="eyebrow mb-6">04 — {t.contact.eyebrow}</p>
         <h2 id="contact-title" className="display max-w-6xl text-[clamp(3rem,10vw,9.5rem)]">
-          <SplitText text={t.contact.heading} by="words" />
+          <SplitText key={lang} text={t.contact.heading} by="words" />
         </h2>
 
         <div className="mt-20 grid gap-16 lg:grid-cols-[1fr_1.3fr]">
           <div className="space-y-8">
             <p className="max-w-sm text-lg text-paper/70">
-              Tell me about your project. I usually reply within 24 hours. {site.availability}.
+              {t.contact.intro} {profile.availability}.
             </p>
             <div className="flex flex-wrap gap-3">
               <Magnetic>
-                <WhatsAppLink className="btn-primary" label={`WhatsApp · ${site.phoneDisplay}`} text="Hi Ahmed, I'd like to talk about a project" />
+                <WhatsAppLink className="btn-primary" label={<>WhatsApp · <bdi dir="ltr">{site.phoneDisplay}</bdi></>} text={t.waGreeting} />
               </Magnetic>
             </div>
             <SocialIcons />
@@ -114,39 +117,39 @@ export function Contact() {
             viewport={{ once: true }}
             transition={{ duration: 1, ease: expoOut }}
           >
-            <Field id="name" label="Name" error={errors.name?.message}>
-              <input id="name" autoComplete="name" className={field} placeholder="Your name" aria-invalid={!!errors.name} aria-describedby={errors.name ? 'name-error' : undefined} {...register('name')} />
+            <Field id="name" label={t.contact.fields.name} error={errors.name?.message}>
+              <input id="name" autoComplete="name" className={field} placeholder={t.contact.placeholders.name} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'name-error' : undefined} {...register('name')} />
             </Field>
-            <Field id="email" label="Email" error={errors.email?.message}>
-              <input id="email" type="email" autoComplete="email" className={field} placeholder="you@company.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} {...register('email')} />
+            <Field id="email" label={t.contact.fields.email} error={errors.email?.message}>
+              <input id="email" type="email" autoComplete="email" className={field} placeholder={t.contact.placeholders.email} dir="ltr" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} {...register('email')} />
             </Field>
-            <Field id="projectType" label="Project type" error={errors.projectType?.message}>
+            <Field id="projectType" label={t.contact.fields.projectType} error={errors.projectType?.message}>
               <select id="projectType" className={cn(field, 'appearance-none')} defaultValue="" aria-invalid={!!errors.projectType} {...register('projectType')}>
                 <option value="" disabled>
-                  Select…
+                  {t.contact.placeholders.select}
                 </option>
                 {projectTypes.map((p) => (
                   <option key={p} value={p} className="bg-ink">
-                    {p}
+                    {typeLabel(p)}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field id="budget" label="Budget range" error={errors.budget?.message}>
+            <Field id="budget" label={t.contact.fields.budget} error={errors.budget?.message}>
               <select id="budget" className={cn(field, 'appearance-none')} defaultValue="" aria-invalid={!!errors.budget} {...register('budget')}>
                 <option value="" disabled>
-                  Select…
+                  {t.contact.placeholders.select}
                 </option>
                 {budgets.map((b) => (
                   <option key={b} value={b} className="bg-ink">
-                    {b}
+                    {budgetLabel(b)}
                   </option>
                 ))}
               </select>
             </Field>
             <div className="md:col-span-2">
-              <Field id="message" label="Message" error={errors.message?.message}>
-                <textarea id="message" rows={5} className={cn(field, 'resize-none')} placeholder="What are we making? Timeline, references, deliverables…" aria-invalid={!!errors.message} {...register('message')} />
+              <Field id="message" label={t.contact.fields.message} error={errors.message?.message}>
+                <textarea id="message" rows={5} className={cn(field, 'resize-none')} placeholder={t.contact.placeholders.message} aria-invalid={!!errors.message} {...register('message')} />
               </Field>
             </div>
             {/* honeypot */}
@@ -157,7 +160,7 @@ export function Contact() {
                 <button type="submit" disabled={status === 'sending'} className="btn-primary relative px-8 py-4 disabled:opacity-70">
                   {status === 'sending' && (
                     <motion.span
-                      className="absolute inset-y-0 left-0 bg-violet-soft/60"
+                      className="absolute inset-y-0 start-0 bg-violet-soft/60"
                       initial={{ width: '0%' }}
                       animate={{ width: '95%' }}
                       transition={{ duration: 3, ease: 'easeOut' }}
@@ -165,7 +168,7 @@ export function Contact() {
                   )}
                   <span className="relative inline-flex items-center gap-2">
                     <WhatsAppIcon className="text-[#25D366]" />
-                    {status === 'sending' ? t.contact.sending : t.contact.submit} →
+                    {status === 'sending' ? t.contact.sending : t.contact.submit} {t.contact.arrow}
                   </span>
                 </button>
               </Magnetic>

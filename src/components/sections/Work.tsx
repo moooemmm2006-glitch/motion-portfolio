@@ -5,9 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { projects } from '@/data/projects';
-import { categories, categoryLabel } from '@/data/categories';
-import { t } from '@/data/dictionary';
+import { projects as baseProjects } from '@/data/projects';
+import { useContent, useLang } from '@/components/providers/LangProvider';
 import type { Category } from '@/data/types';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
 import { useIsMobile } from '@/hooks/useReducedMotion';
@@ -29,6 +28,9 @@ export function Work() {
   const can3D = useCanUse3D();
   const mobile = useIsMobile();
   const navigate = usePageTransition();
+  const { t, lang } = useLang();
+  const { categories, categoryLabel, project: localize } = useContent();
+  const projects = useMemo(() => baseProjects.map(localize), [localize]);
   const [filter, setFilter] = useState<Category | 'all'>('all');
   const [view, setView] = useState<'3d' | 'grid'>('3d');
   const [focused, setFocused] = useState(projects[0].slug);
@@ -41,7 +43,7 @@ export function Work() {
   const picked = useRef(0);
   const scrollOff = useRef(0);
 
-  const shown = useMemo(() => projects.filter((p) => filter === 'all' || p.category === filter), [filter]);
+  const shown = useMemo(() => projects.filter((p) => filter === 'all' || p.category === filter), [filter, projects]);
   const visible = useMemo(() => new Set(shown.map((p) => p.slug)), [shown]);
   const is3D = can3D && view === '3d';
   const last = Math.max(0, shown.length - 1);
@@ -110,7 +112,7 @@ export function Work() {
   return (
     <section id="work" aria-labelledby="work-title" className="relative pt-28 md:pt-40">
       <div className="container-x">
-        <SectionHeading id="work-title" index="02" eyebrow={t.work.eyebrow} title={t.work.heading} className="md:mb-12" />
+        <SectionHeading key={lang} id="work-title" index="02" eyebrow={t.work.eyebrow} title={t.work.heading} className="md:mb-12" />
 
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div role="toolbar" aria-label="Filter projects by category" className="-mx-1 flex flex-wrap gap-2">
@@ -201,16 +203,16 @@ export function Work() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <div className="pointer-events-auto flex items-center gap-2">
-                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Previous project" onClick={() => goTo(focusedIdx - 1)}>
+                <div className="pointer-events-auto flex items-center gap-2" dir="ltr">
+                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label={t.work.prev} onClick={() => goTo(focusedIdx - 1)}>
                     ←
                   </button>
-                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Next project" onClick={() => goTo(focusedIdx + 1)}>
+                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label={t.work.next} onClick={() => goTo(focusedIdx + 1)}>
                     →
                   </button>
                   {focusedProject && (
                     <TransitionLink href={`/work/${focusedProject.slug}`} transitionLabel={focusedProject.title} className="btn-primary hidden sm:inline-flex">
-                      View project
+                      {t.work.viewProject}
                     </TransitionLink>
                   )}
                 </div>

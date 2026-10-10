@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { nav, site, whatsappUrl } from '@/data/site';
 import { useUI } from '@/components/providers/UIProvider';
+import { useLang } from '@/components/providers/LangProvider';
 import { useLenis } from '@/components/providers/SmoothScroll';
 import { cineInOut, expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,9 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { sound, toggleSound } = useUI();
+  const { t, lang, setLang } = useLang();
+  // the menu opens from the burger's corner, which flips sides in Arabic
+  const menuX = lang === 'ar' ? '0%' : '100%';
   const lenis = useLenis();
 
   useEffect(() => {
@@ -47,7 +51,7 @@ export function Navbar() {
         transition={{ duration: 0.6, ease: expoOut }}
       >
         <nav className="container-x flex h-20 items-center justify-between" aria-label="Main">
-          <TransitionLink href="/" className="font-display text-lg font-bold tracking-tight" transitionLabel="Home">
+          <TransitionLink href="/" dir="ltr" className="font-display text-lg font-bold tracking-tight" transitionLabel="Home">
             {site.name}
             <span className="text-violet-soft">.</span>
           </TransitionLink>
@@ -60,8 +64,8 @@ export function Navbar() {
                     href={item.href}
                     className="group relative block px-4 py-2 text-sm text-paper/70 transition-colors hover:text-paper"
                   >
-                    {item.label}
-                    <span className="absolute inset-x-4 bottom-1 h-px origin-left scale-x-0 bg-violet-soft transition-transform duration-500 ease-out-expo group-hover:scale-x-100" />
+                    {t.nav[item.href] ?? item.label}
+                    <span className="absolute inset-x-4 bottom-1 h-px origin-left rtl:origin-right scale-x-0 bg-violet-soft transition-transform duration-500 ease-out-expo group-hover:scale-x-100" />
                   </TransitionLink>
                 </Magnetic>
               </li>
@@ -84,10 +88,11 @@ export function Navbar() {
                 />
               ))}
             </button>
+            <LangSwitch lang={lang} onChange={setLang} />
             <Magnetic className="hidden md:inline-block">
-              <a href={whatsappUrl("Hi Ahmed, I'd like to talk about a project")} target="_blank" rel="noreferrer" className="btn-primary gap-2">
+              <a href={whatsappUrl(t.waGreeting)} target="_blank" rel="noreferrer" className="btn-primary gap-2">
                 <WhatsAppIcon className="text-[#25D366]" />
-                Let&apos;s talk
+                {t.letsTalk}
               </a>
             </Magnetic>
             <button
@@ -95,7 +100,7 @@ export function Navbar() {
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
               aria-controls="mobile-menu"
-              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-label={open ? t.menu.close : t.menu.open}
             >
               <motion.span className="h-px w-6 bg-paper" animate={{ rotate: open ? 45 : 0, y: open ? 3.5 : 0 }} />
               <motion.span className="h-px w-6 bg-paper" animate={{ rotate: open ? -45 : 0, y: open ? -3.5 : 0 }} />
@@ -109,9 +114,9 @@ export function Navbar() {
           <motion.div
             id="mobile-menu"
             className="fixed inset-0 z-[65] flex flex-col justify-between bg-ink px-[var(--gutter)] pb-10 pt-28"
-            initial={{ clipPath: 'circle(0% at 100% 0%)' }}
-            animate={{ clipPath: 'circle(150% at 100% 0%)' }}
-            exit={{ clipPath: 'circle(0% at 100% 0%)' }}
+            initial={{ clipPath: `circle(0% at ${menuX} 0%)` }}
+            animate={{ clipPath: `circle(150% at ${menuX} 0%)` }}
+            exit={{ clipPath: `circle(0% at ${menuX} 0%)` }}
             transition={{ duration: 0.8, ease: cineInOut }}
           >
             <ul className="space-y-2">
@@ -128,7 +133,7 @@ export function Navbar() {
                       className="display flex items-baseline gap-4 text-6xl"
                     >
                       <span className="font-mono text-xs text-violet-soft">0{i + 1}</span>
-                      {item.label}
+                      {t.nav[item.href] ?? item.label}
                     </TransitionLink>
                   </motion.div>
                 </li>
@@ -140,5 +145,34 @@ export function Navbar() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+/** EN | ع segmented switch; the pill slides to the active language. */
+function LangSwitch({ lang, onChange }: { lang: 'en' | 'ar'; onChange: (l: 'en' | 'ar') => void }) {
+  const options = [
+    { id: 'en', label: 'EN', name: 'English' },
+    { id: 'ar', label: 'ع', name: 'العربية' },
+  ] as const;
+  return (
+    <div dir="ltr" role="group" aria-label="Language" className="flex h-10 items-center rounded-full border border-white/15 bg-white/[0.04] p-1 backdrop-blur">
+      {options.map((o) => (
+        <button
+          key={o.id}
+          onClick={() => onChange(o.id)}
+          aria-pressed={lang === o.id}
+          aria-label={o.name}
+          lang={o.id}
+          className={cn(
+            'relative flex h-8 min-w-9 items-center justify-center rounded-full px-3 text-xs font-medium transition-colors duration-300',
+            lang === o.id ? 'text-ink' : 'text-paper/60 hover:text-paper',
+            o.id === 'ar' && 'font-display text-sm',
+          )}
+        >
+          {lang === o.id && <motion.span layoutId="lang-pill" className="absolute inset-0 rounded-full bg-paper" transition={{ duration: 0.5, ease: expoOut }} />}
+          <span className="relative">{o.label}</span>
+        </button>
+      ))}
+    </div>
   );
 }

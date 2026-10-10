@@ -34,7 +34,7 @@ export function VideoPlayer({ source, title, autoPlay = false, className, startM
         ? `https://player.vimeo.com/video/${source.id}?autoplay=${autoPlay ? 1 : 0}&title=0&byline=0&portrait=0&dnt=1`
         : `https://www.youtube-nocookie.com/embed/${source.id}?autoplay=${autoPlay ? 1 : 0}&rel=0&modestbranding=1`;
     return (
-      <div className={cn('relative aspect-video w-full overflow-hidden bg-black', className)}>
+      <div dir="ltr" className={cn('relative aspect-video w-full overflow-hidden bg-black', className)}>
         <iframe
           src={src}
           title={title}
@@ -137,6 +137,7 @@ function NativePlayer({ source, title, autoPlay, className, startMuted, onEnded,
   return (
     <div
       ref={wrap}
+      dir="ltr"
       className={cn('group relative aspect-video w-full overflow-hidden bg-black', className)}
       onPointerMove={poke}
       onKeyDown={onKey}

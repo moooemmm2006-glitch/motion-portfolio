@@ -1,4 +1,8 @@
+'use client';
+
+import type { ReactNode } from 'react';
 import { site, whatsappUrl } from '@/data/site';
+import { useLang } from '@/components/providers/LangProvider';
 import { cn } from '@/lib/utils';
 
 export function WhatsAppIcon({ className }: { className?: string }) {
@@ -10,24 +14,25 @@ export function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 /** Direct WhatsApp link with the logo, used everywhere people can reach out. */
-export function WhatsAppLink({ className, label = site.phoneDisplay, text }: { className?: string; label?: string; text?: string }) {
+export function WhatsAppLink({ className, label, text }: { className?: string; label?: ReactNode; text?: string }) {
   return (
     <a href={whatsappUrl(text)} target="_blank" rel="noreferrer" className={cn('inline-flex items-center gap-2', className)} aria-label={`WhatsApp ${site.phoneDisplay}`}>
       <WhatsAppIcon className="text-[#25D366]" />
-      <span>{label}</span>
+      <span>{label ?? <bdi dir="ltr">{site.phoneDisplay}</bdi>}</span>
     </a>
   );
 }
 
 /** Floating chat button, always one tap from a WhatsApp conversation. */
 export function WhatsAppFloat() {
+  const { t } = useLang();
   return (
     <a
-      href={whatsappUrl("Hi Ahmed, I'd like to talk about a project")}
+      href={whatsappUrl(t.waGreeting)}
       target="_blank"
       rel="noreferrer"
       aria-label={`Chat on WhatsApp ${site.phoneDisplay}`}
-      className="group fixed bottom-24 right-5 z-[65] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_40px_-8px_rgba(37,211,102,0.65)] transition-transform duration-300 hover:scale-110 md:bottom-24 md:right-8"
+      className="group fixed bottom-24 end-5 z-[65] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_40px_-8px_rgba(37,211,102,0.65)] transition-transform duration-300 hover:scale-110 md:bottom-24 md:end-8"
     >
       <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-25" />
       <WhatsAppIcon className="relative h-7 w-7" />
