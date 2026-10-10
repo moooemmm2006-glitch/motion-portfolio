@@ -55,13 +55,16 @@ export function SplitText({ text, as = 'span', className, pieceClassName, by = '
   }, [by, delay, stagger, trigger, play, text]);
 
   const words = text.split(' ');
+  const latin = !/[\u0600-\u06FF]/.test(text);
   const Tag = as as 'span';
   return (
     <Tag
       ref={ref as React.RefObject<HTMLSpanElement>}
       // letter-by-letter text is Latin (names, titles): keep it LTR inside Arabic pages
-      dir={by === 'chars' ? 'ltr' : undefined}
-      className={cn('inline-block', by === 'chars' && 'rtl:text-right', className)}
+      // and let words follow their own script, so an English line stays in order on the Arabic page
+      dir={by === 'chars' ? 'ltr' : 'auto'}
+      lang={latin ? 'en' : undefined}
+      className={cn('inline-block rtl:text-right', className)}
       aria-label={text}
     >
       {words.map((word, wi) => (

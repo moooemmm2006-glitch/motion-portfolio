@@ -24,7 +24,7 @@ export function About() {
   return (
     <section id="about" className="relative py-28 md:py-40" aria-labelledby="about-title">
       <div className="container-x">
-        <SectionHeading key={lang} id="about-title" index="01" eyebrow={t.about.eyebrow} title={t.about.heading} />
+        <SectionHeading key={lang} id="about-title" index="01" eyebrow={t.about.eyebrow} title={t.about.heading} sub={t.about.sub} />
 
         <div className="grid items-center gap-16 lg:grid-cols-[5fr_6fr]">
           <div ref={portraitRef} className="relative aspect-[4/5] w-full max-w-md" data-cursor="HELLO">

@@ -171,3 +171,7 @@ html[lang='ar'] .text-gradient {
   padding-block: 0.15em 0.35em;
   margin-block: -0.15em -0.35em;
 }
+/* English lines on the Arabic page keep the English display spacing */
+html[lang='ar'] .display [lang='en'] {
+  letter-spacing: -0.06em;
+}
