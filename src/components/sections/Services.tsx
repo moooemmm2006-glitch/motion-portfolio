@@ -31,11 +31,13 @@ function ServiceCard({ service, i }: { service: Service; i: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 50, rotateX: 35 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 1, ease: expoOut, delay: (i % 3) * 0.08 }}
       className="[perspective:1000px]"
+      style={{ transformPerspective: 1000 }}
+      whileTap={{ scale: 0.97 }}
     >
       <motion.div
         ref={ref}

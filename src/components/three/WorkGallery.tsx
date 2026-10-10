@@ -37,7 +37,9 @@ function Card({
   index,
   dragged,
   onOpen,
+  touch,
 }: {
+  touch: boolean;
   project: Project;
   posterTex: THREE.Texture;
   slot: number;
@@ -54,6 +56,7 @@ function Card({
   const angle = useRef(slot * STEP);
   const lift = useRef(shown ? 0 : -3);
   const prevIndex = useRef(0);
+  const autoPlaying = useRef(false);
 
   const uniforms = useMemo(
     () => ({
@@ -118,8 +121,22 @@ function Card({
     m.position.set(Math.sin(a) * RADIUS, lift.current, Math.cos(a) * RADIUS - RADIUS);
     m.rotation.y = a;
 
-    hover.current = THREE.MathUtils.damp(hover.current, hovered.current ? 1 : 0, 6, delta);
     const focus = Math.max(0, 1 - Math.abs(slot - i) * 1.4);
+    // Touch screens can't hover: the card in front plays its preview and ripples on its own.
+    if (touch) {
+      const front = shown && Math.abs(slot - i) < 0.35;
+      if (front && !autoPlaying.current) {
+        autoPlaying.current = true;
+        hovered.current = true;
+        playPreview();
+      } else if (!front && autoPlaying.current) {
+        autoPlaying.current = false;
+        hovered.current = false;
+        stopPreview();
+      }
+      if (front) uniforms.uMouse.value.set(0.5 + Math.sin(state.clock.elapsedTime * 0.7) * 0.3, 0.5 + Math.cos(state.clock.elapsedTime * 0.5) * 0.25);
+    }
+    hover.current = THREE.MathUtils.damp(hover.current, hovered.current ? 1 : 0, 6, delta);
     uniforms.uTime.value = state.clock.elapsedTime;
     uniforms.uHover.value = hover.current;
     uniforms.uFocus.value = THREE.MathUtils.damp(uniforms.uFocus.value, shown ? focus : 0, 6, delta);
@@ -147,13 +164,14 @@ function Card({
     <mesh
       ref={mesh}
       onPointerOver={(e) => {
-        if (!shown) return;
+        if (!shown || touch) return;
         e.stopPropagation();
         hovered.current = true;
         setCursorLabel('PLAY');
         playPreview();
       }}
       onPointerOut={() => {
+        if (touch) return;
         hovered.current = false;
         setCursorLabel(null);
         stopPreview();
@@ -179,7 +197,7 @@ function Card({
   );
 }
 
-function Ring({ projects, visible, index, dragged, onOpen, onFocus }: Omit<Props, 'active' | 'mobile'>) {
+function Ring({ projects, visible, index, dragged, onOpen, onFocus, mobile }: Omit<Props, 'active'>) {
   const posters = useTexture(projects.map((p) => p.poster));
   posters.forEach((t) => (t.colorSpace = THREE.SRGBColorSpace));
   const shownList = projects.filter((p) => visible.has(p.slug));
@@ -189,7 +207,9 @@ function Ring({ projects, visible, index, dragged, onOpen, onFocus }: Omit<Props
   // pull the camera back on portrait screens so a full card fits
   useEffect(() => {
     const aspect = size.width / size.height;
-    camera.position.z = aspect < 1 ? 9.5 : 6.5;
+    // distance at which the front card (plus a margin) fills the width on narrow screens
+    const fit = (CARD_W * 1.4) / (2 * Math.tan(THREE.MathUtils.degToRad(20)) * aspect);
+    camera.position.z = Math.max(6.5, fit);
     camera.updateProjectionMatrix();
   }, [camera, size]);
 
@@ -217,6 +237,7 @@ function Ring({ projects, visible, index, dragged, onOpen, onFocus }: Omit<Props
             index={index}
             dragged={dragged}
             onOpen={onOpen}
+            touch={mobile}
           />
         );
       })}

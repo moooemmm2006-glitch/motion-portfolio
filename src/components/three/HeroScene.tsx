@@ -13,7 +13,7 @@ import {
   useVideoTexture,
 } from '@react-three/drei';
 import { Bloom, ChromaticAberration, EffectComposer, Vignette } from '@react-three/postprocessing';
-import { Suspense, useRef, useState, type MutableRefObject } from 'react';
+import { Suspense, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import * as THREE from 'three';
 import { site } from '@/data/site';
 
@@ -46,6 +46,22 @@ function VideoMat({ src }: { src: string }) {
   return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
+/** Phone tilt as -1..1 (Android gives it freely; iOS only after a permission tap, so it's simply 0 there). */
+function useDeviceTilt(enabled: boolean) {
+  const tilt = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    if (!enabled) return;
+    const onOrient = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return;
+      tilt.current.x = THREE.MathUtils.clamp(e.gamma / 30, -1, 1);
+      tilt.current.y = THREE.MathUtils.clamp((e.beta - 45) / 30, -1, 1);
+    };
+    window.addEventListener('deviceorientation', onOrient);
+    return () => window.removeEventListener('deviceorientation', onOrient);
+  }, [enabled]);
+  return tilt;
+}
+
 /** A stylized camera lens: metal barrel, glowing ring, the showreel inside and a glass front element. */
 function Lens({ progress, quality }: { progress: MutableRefObject<number>; quality: Quality }) {
   const group = useRef<THREE.Group>(null);
@@ -56,15 +72,20 @@ function Lens({ progress, quality }: { progress: MutableRefObject<number>; quali
   const scale = small ? Math.min(0.8, viewport.width / 4.2) : 0.9;
   const baseY = small ? viewport.height * 0.27 : 0;
   const baseX = small ? 0 : viewport.width * 0.25;
+  const tilt = useDeviceTilt(small);
 
   useFrame((state, delta) => {
     const g = group.current;
     if (!g) return;
     const p = progress.current;
+    // touch screens have no hover, so the lens drifts on its own (plus device tilt when allowed)
+    const t = state.clock.elapsedTime;
+    const px = small ? Math.sin(t * 0.6) * 0.6 + tilt.current.x : pointer.x;
+    const py = small ? Math.cos(t * 0.45) * 0.4 + tilt.current.y : pointer.y;
     // mouse parallax + subtle rotation, eased like an AE Easy Ease
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, pointer.x * 0.45 - 0.35 + p * 0.6, 3, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, -pointer.y * 0.3 + 0.12, 3, delta);
-    g.position.x = THREE.MathUtils.damp(g.position.x, baseX + pointer.x * 0.25, 3, delta);
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, px * 0.45 - (small ? 0 : 0.35) + p * 0.6, 3, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, -py * 0.3 + 0.12, 3, delta);
+    g.position.x = THREE.MathUtils.damp(g.position.x, baseX + px * (small ? 0.12 : 0.25), 3, delta);
     g.position.y = THREE.MathUtils.damp(g.position.y, baseY + p * 1.2, 3, delta);
     // scroll: fly toward the camera
     g.position.z = THREE.MathUtils.damp(g.position.z, p * 4.5, 4, delta);
@@ -173,14 +194,21 @@ export default function HeroScene({ progress, active, mobile }: Props) {
         </Environment>
       </Suspense>
 
-      <Sparkles count={mobile ? 40 : 140} scale={[14, 8, 6]} size={mobile ? 2 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />
-      <Sparkles count={mobile ? 10 : 30} scale={[16, 9, 4]} position={[0, 0, -3]} size={12} speed={0.1} opacity={0.15} color="#FF6B3D" />
+      <Sparkles count={mobile ? 90 : 140} scale={[14, 8, 6]} size={mobile ? 2.5 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />
+      <Sparkles count={mobile ? 20 : 30} scale={[16, 9, 4]} position={[0, 0, -3]} size={12} speed={0.1} opacity={0.15} color="#FF6B3D" />
 
       {!mobile && quality === 'high' && (
         <EffectComposer multisampling={0}>
           <Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.6} luminanceSmoothing={0.2} />
           <ChromaticAberration offset={CA_OFFSET} radialModulation={false} modulationOffset={0} />
           <Vignette eskil={false} offset={0.25} darkness={0.75} />
+        </EffectComposer>
+      )}
+      {/* Phones get a light pass: bloom on the glowing ring + vignette, no chromatic aberration */}
+      {mobile && (
+        <EffectComposer multisampling={0}>
+          <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.55} luminanceSmoothing={0.25} />
+          <Vignette eskil={false} offset={0.25} darkness={0.7} />
         </EffectComposer>
       )}
       {!mobile && quality === 'low' && (
