@@ -62,7 +62,7 @@ export function Hero() {
           <HeroScene progress={progress} active={active} mobile={mobile} />
         ) : (
           <div className="absolute inset-0">
-            <Image src={site.showreel.poster ?? '/posters/showreel.jpg'} alt="" fill priority sizes="100vw" className="object-cover opacity-50" />
+            <Image src={site.showreel.poster ?? '/posters/ai-sales-roleplay.jpg'} alt="" fill priority sizes="100vw" className="object-cover opacity-50" />
             <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
           </div>
         )}

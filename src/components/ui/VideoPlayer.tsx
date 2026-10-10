@@ -130,7 +130,7 @@ function NativePlayer({ source, title, autoPlay, className }: Props & { source: 
     >
       <video
         ref={video}
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
         poster={source.poster}
         playsInline
         muted={muted}
