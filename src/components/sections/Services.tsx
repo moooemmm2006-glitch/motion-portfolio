@@ -79,9 +79,12 @@ export function Services() {
     <section id="services" className="relative py-28 md:py-40" aria-labelledby="services-title">
       <div className="container-x">
         <SectionHeading id="services-title" index="03" eyebrow={t.services.eyebrow} title={t.services.heading} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Six-column grid so a short last row (3 + 2) sits centered. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {services.map((s, i) => (
-            <ServiceCard key={s.title} service={s} i={i} />
+            <div key={s.title} className={`lg:col-span-2 ${services.length % 3 === 2 && i === services.length - 2 ? 'lg:col-start-2' : ''}`}>
+              <ServiceCard service={s} i={i} />
+            </div>
           ))}
         </div>
       </div>

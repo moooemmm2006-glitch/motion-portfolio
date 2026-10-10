@@ -4,8 +4,6 @@ export const projectTypes = [
   'Video Editing',
   'Motion Graphics',
   'Logo Animation',
-  'Social Media Content',
-  'Ads & Commercials',
   'Color Grading',
   'VFX & Compositing',
   'Other',
