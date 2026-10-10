@@ -71,7 +71,7 @@ export const ar: Dictionary = {
   waGreeting: 'مرحباً أحمد، أود التحدث معك بخصوص مشروع',
   menu: { open: 'فتح القائمة', close: 'إغلاق القائمة' },
   hero: { play: 'شاهد الأعمال', scroll: 'مرّر' },
-  about: { eyebrow: 'نبذة عني', heading: 'Video Editor & Motion Designer', sub: 'أحوّل أفكارك إلى فيديوهات.', tools: 'أدواتي', mainTool: 'الأداة الأساسية', portrait: 'صورة' },
+  about: { eyebrow: 'نبذة عني', heading: 'مونتير وصانع موشن جرافيك', sub: 'أحوّل أفكارك إلى فيديوهات.', tools: 'أدواتي', mainTool: 'الأداة الأساسية', portrait: 'صورة' },
   work: {
     eyebrow: 'أعمال مختارة',
     heading: 'كل فريم هنا يستحق مكانه.',
