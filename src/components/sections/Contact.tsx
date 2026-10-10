@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { site, whatsappUrl } from '@/data/site';
 import { useContent, useLang } from '@/components/providers/LangProvider';
 import { budgets, makeContactSchema, projectTypes, type ContactInput } from '@/lib/contact-schema';
@@ -15,6 +15,7 @@ import { SplitText } from '@/components/ui/SplitText';
 import { expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
 import { SocialIcons, WhatsAppIcon, WhatsAppLink } from '@/components/ui/Brand';
+import { GlassSelect } from '@/components/ui/GlassSelect';
 
 const ContactScene = dynamic(() => import('@/components/three/ContactScene'), { ssr: false });
 
@@ -58,6 +59,7 @@ export function Contact() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<ContactInput>({ resolver: zodResolver(schema) });
 
@@ -124,28 +126,40 @@ export function Contact() {
               <input id="email" type="email" autoComplete="email" className={field} placeholder={t.contact.placeholders.email} dir="ltr" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} {...register('email')} />
             </Field>
             <Field id="projectType" label={t.contact.fields.projectType} error={errors.projectType?.message}>
-              <select id="projectType" className={cn(field, 'appearance-none')} defaultValue="" aria-invalid={!!errors.projectType} {...register('projectType')}>
-                <option value="" disabled>
-                  {t.contact.placeholders.select}
-                </option>
-                {projectTypes.map((p) => (
-                  <option key={p} value={p} className="bg-ink">
-                    {typeLabel(p)}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="projectType"
+                control={control}
+                render={({ field: f }) => (
+                  <GlassSelect
+                    id="projectType"
+                    value={f.value}
+                    onChange={f.onChange}
+                    onBlur={f.onBlur}
+                    options={projectTypes.map((v) => ({ value: v, label: typeLabel(v) }))}
+                    placeholder={t.contact.placeholders.select}
+                    invalid={!!errors.projectType}
+                    className={field}
+                  />
+                )}
+              />
             </Field>
             <Field id="budget" label={t.contact.fields.budget} error={errors.budget?.message}>
-              <select id="budget" className={cn(field, 'appearance-none')} defaultValue="" aria-invalid={!!errors.budget} {...register('budget')}>
-                <option value="" disabled>
-                  {t.contact.placeholders.select}
-                </option>
-                {budgets.map((b) => (
-                  <option key={b} value={b} className="bg-ink">
-                    {budgetLabel(b)}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="budget"
+                control={control}
+                render={({ field: f }) => (
+                  <GlassSelect
+                    id="budget"
+                    value={f.value}
+                    onChange={f.onChange}
+                    onBlur={f.onBlur}
+                    options={budgets.map((v) => ({ value: v, label: budgetLabel(v) }))}
+                    placeholder={t.contact.placeholders.select}
+                    invalid={!!errors.budget}
+                    className={field}
+                  />
+                )}
+              />
             </Field>
             <div className="md:col-span-2">
               <Field id="message" label={t.contact.fields.message} error={errors.message?.message}>
