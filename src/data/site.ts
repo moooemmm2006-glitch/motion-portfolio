@@ -4,8 +4,8 @@ import type { VideoSource } from './types';
  * Everything about you lives here. Replace the [BRACKETED] values.
  */
 export const site = {
-  name: '[YOUR NAME]',
-  shortName: '[YN]',
+  name: 'AHMED ARK',
+  shortName: 'AA',
   title: 'Video Editor & Motion Designer',
   specialty: 'After Effects Specialist',
   tagline: 'I turn raw footage into stories that move.',
@@ -16,7 +16,8 @@ export const site = {
   location: '[CITY, COUNTRY]',
   availability: 'Available for remote work worldwide',
   email: 'hello@example.com',
-  whatsapp: '+10000000000',
+  whatsapp: '+201117651679',
+  phoneDisplay: '0111 765 1679',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com',
   portrait: '/images/portrait.jpg',
   showreel: {
@@ -47,6 +48,10 @@ export const site = {
     { name: 'Element 3D', short: 'E3', color: '#F2F2F2' },
   ],
 } as const;
+
+/** wa.me link straight into a chat, optionally with a prefilled message. */
+export const whatsappUrl = (text?: string) =>
+  `https://wa.me/${site.whatsapp.replace(/\D/g, '')}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 
 export const nav = [
   { label: 'Work', href: '/#work' },

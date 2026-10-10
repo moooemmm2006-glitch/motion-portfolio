@@ -14,6 +14,7 @@ import { Magnetic } from '@/components/ui/Magnetic';
 import { SplitText } from '@/components/ui/SplitText';
 import { expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
+import { WhatsAppLink } from '@/components/ui/Brand';
 
 const ContactScene = dynamic(() => import('@/components/three/ContactScene'), { ssr: false });
 
@@ -73,7 +74,6 @@ export function Contact() {
     }
   };
 
-  const wa = `https://wa.me/${site.whatsapp.replace(/\D/g, '')}`;
 
   return (
     <section ref={section} id="contact" className="relative isolate overflow-hidden py-28 md:py-40" aria-labelledby="contact-title">
@@ -98,14 +98,7 @@ export function Contact() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Magnetic>
-                <a href={`mailto:${site.email}`} className="btn-primary">
-                  ✉ {site.email}
-                </a>
-              </Magnetic>
-              <Magnetic>
-                <a href={wa} target="_blank" rel="noreferrer" className="btn-ghost">
-                  WhatsApp ↗
-                </a>
+                <WhatsAppLink className="btn-primary" label={`WhatsApp · ${site.phoneDisplay}`} text="Hi Ahmed, I'd like to talk about a project" />
               </Magnetic>
             </div>
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-paper/60">

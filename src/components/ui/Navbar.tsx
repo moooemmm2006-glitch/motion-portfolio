@@ -2,13 +2,14 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { nav, site } from '@/data/site';
+import { nav, site, whatsappUrl } from '@/data/site';
 import { useUI } from '@/components/providers/UIProvider';
 import { useLenis } from '@/components/providers/SmoothScroll';
 import { cineInOut, expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
+import { BrandName, WhatsAppIcon, WhatsAppLink } from './Brand';
 
 export function Navbar() {
   const [hidden, setHidden] = useState(false);
@@ -47,8 +48,7 @@ export function Navbar() {
       >
         <nav className="container-x flex h-20 items-center justify-between" aria-label="Main">
           <TransitionLink href="/" className="font-display text-lg font-bold tracking-tight" transitionLabel="Home">
-            {site.name}
-            <span className="text-violet-soft">.</span>
+            <BrandName badgeClassName="text-[1.35em]" />
           </TransitionLink>
 
           <ul className="hidden items-center gap-1 md:flex">
@@ -84,9 +84,10 @@ export function Navbar() {
               ))}
             </button>
             <Magnetic className="hidden md:inline-block">
-              <TransitionLink href="/#contact" className="btn-primary">
+              <a href={whatsappUrl("Hi Ahmed, I'd like to talk about a project")} target="_blank" rel="noreferrer" className="btn-primary gap-2">
+                <WhatsAppIcon className="text-[#25D366]" />
                 Let&apos;s talk
-              </TransitionLink>
+              </a>
             </Magnetic>
             <button
               className="relative flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
@@ -132,6 +133,7 @@ export function Navbar() {
                 </li>
               ))}
             </ul>
+            <WhatsAppLink className="mb-6 text-lg text-paper" />
             <div className="flex flex-wrap gap-4 text-sm text-paper/60">
               {site.socials.map((s) => (
                 <a key={s.label} href={s.href} target="_blank" rel="noreferrer">

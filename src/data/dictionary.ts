@@ -21,7 +21,7 @@ export const en = {
     eyebrow: 'Contact',
     heading: "Let's make something that moves.",
     sent: 'Message sent. I will reply within 24 hours.',
-    error: 'Something went wrong. Please email me directly.',
+    error: 'Something went wrong. Please message me on WhatsApp instead.',
     submit: 'Send message',
     sending: 'Rendering…',
   },

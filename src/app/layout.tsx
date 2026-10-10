@@ -7,6 +7,7 @@ import { TransitionProvider } from '@/components/providers/TransitionProvider';
 import { UIProvider } from '@/components/providers/UIProvider';
 import { Cursor } from '@/components/ui/Cursor';
 import { Footer } from '@/components/ui/Footer';
+import { WhatsAppFloat } from '@/components/ui/Brand';
 import { Navbar } from '@/components/ui/Navbar';
 import { ShowreelModal } from '@/components/ui/ShowreelModal';
 import './globals.css';
@@ -45,7 +46,7 @@ const personLd = {
   name: site.name,
   jobTitle: `${site.title}, ${site.specialty}`,
   description: site.tagline,
-  email: `mailto:${site.email}`,
+  telephone: site.whatsapp,
   url: site.url,
   image: `${site.url}${site.portrait}`,
   address: { '@type': 'PostalAddress', addressLocality: site.location },
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Navbar />
               <main id="main">{children}</main>
               <Footer />
+              <WhatsAppFloat />
               <ShowreelModal />
               <Cursor />
               <div className="grain" aria-hidden />
