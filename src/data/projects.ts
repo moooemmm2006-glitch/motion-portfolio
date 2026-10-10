@@ -14,6 +14,33 @@ const media = (slug: string) => ({
 
 export const projects: Project[] = [
   {
+    // Real client work (also plays from the hero "Show videos" button)
+    slug: 'ai-sales-roleplay',
+    title: 'Train Like You Close',
+    client: 'AI sales coaching platform',
+    category: 'commercials',
+    year: 2026,
+    role: 'Editor & Motion Designer',
+    duration: '0:55',
+    tools: ['After Effects', 'Premiere Pro'],
+    deliverables: ['Product promo 16:9', 'UI animation', 'Animated stats & captions'],
+    summary: 'A 55-second promo for an AI platform where sales teams practise calls with realistic AI prospects and get scored on every conversation.',
+    challenge:
+      'Make a dashboard-heavy SaaS product feel human and urgent, and get across the cost of lost deals before viewers scroll away.',
+    approach:
+      'Cut a founder-to-camera story against fast UI sequences: lost calls stacking up, AI roleplay setup, live scoring and team analytics. Kinetic captions and a ticking revenue counter carry the numbers, while soft peach-and-lavender gradients tie the screens to the warm interview grade.',
+    result: 'A clear, high-energy spot that moves from the problem to the product to the payoff in under a minute.',
+    accent: '#FF6B3D',
+    preview: '/videos/ai-sales-roleplay-preview.mp4',
+    poster: '/posters/ai-sales-roleplay.jpg',
+    video: { type: 'file', src: '/videos/ai-sales-roleplay.mp4', poster: '/posters/ai-sales-roleplay.jpg' },
+    gallery: [
+      { src: '/bts/ai-sales-roleplay-1.jpg', alt: 'Animated dashboard with personal training stats' },
+      { src: '/bts/ai-sales-roleplay-2.jpg', alt: 'Lost-call notification sliding in' },
+      { src: '/bts/ai-sales-roleplay-3.jpg', alt: 'AI prospect setup screen' },
+    ],
+  },
+  {
     // Real client work
     slug: 'look-good-online',
     title: 'Look Good Online',

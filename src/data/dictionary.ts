@@ -5,7 +5,7 @@
 export const en = {
   locale: 'en',
   dir: 'ltr',
-  hero: { play: 'Play Showreel', scroll: 'Scroll' },
+  hero: { play: 'Show videos', scroll: 'Scroll' },
   about: { eyebrow: 'About', heading: 'Editor by trade. Animator by obsession.', tools: 'Toolkit' },
   work: {
     eyebrow: 'Selected Work',

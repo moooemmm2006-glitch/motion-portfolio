@@ -13,7 +13,6 @@ export const site = {
     "I'm a video editor and motion designer obsessed with rhythm, timing and the frame-perfect cut. For the past [X] years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
     'After Effects is my home base. From kinetic typography and logo reveals to full commercial edits, compositing and color, I handle the whole pipeline so your story ships polished.',
   ],
-  location: '[CITY, COUNTRY]',
   availability: 'Available for remote work worldwide',
   email: 'hello@example.com',
   whatsapp: '+201117651679',
@@ -22,8 +21,8 @@ export const site = {
   portrait: '/images/portrait.jpg',
   showreel: {
     type: 'file',
-    src: '/videos/showreel.mp4',
-    poster: '/posters/showreel.jpg',
+    src: '/videos/ai-sales-roleplay.mp4',
+    poster: '/posters/ai-sales-roleplay.jpg',
   } satisfies VideoSource as VideoSource,
   socials: [
     { label: 'Instagram', href: 'https://instagram.com/[handle]' },

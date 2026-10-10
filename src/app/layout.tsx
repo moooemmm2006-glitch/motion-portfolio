@@ -5,7 +5,6 @@ import { en } from '@/data/dictionary';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
 import { TransitionProvider } from '@/components/providers/TransitionProvider';
 import { UIProvider } from '@/components/providers/UIProvider';
-import { Cursor } from '@/components/ui/Cursor';
 import { Footer } from '@/components/ui/Footer';
 import { WhatsAppFloat } from '@/components/ui/Brand';
 import { Navbar } from '@/components/ui/Navbar';
@@ -49,7 +48,6 @@ const personLd = {
   telephone: site.whatsapp,
   url: site.url,
   image: `${site.url}${site.portrait}`,
-  address: { '@type': 'PostalAddress', addressLocality: site.location },
   sameAs: site.socials.map((s) => s.href),
   knowsAbout: site.tools.map((t) => t.name),
 };
@@ -70,7 +68,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Footer />
               <WhatsAppFloat />
               <ShowreelModal />
-              <Cursor />
               <div className="grain" aria-hidden />
             </TransitionProvider>
           </SmoothScroll>

@@ -35,9 +35,6 @@ export function About() {
               <Image src={site.portrait} alt={`Portrait of ${site.name}`} fill sizes="(max-width: 1024px) 90vw, 40vw" className="rounded-2xl object-cover" />
             )}
             <span className="sr-only">{`Portrait of ${site.name}`}</span>
-            <div className="absolute -bottom-4 left-4 rounded-full bg-ink px-4 py-2 font-mono text-xs text-paper/70 ring-1 ring-white/10">
-              {site.location}
-            </div>
           </div>
 
           <div>

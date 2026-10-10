@@ -105,7 +105,6 @@ export function Hero() {
           <Magnetic>
             <button
               className="btn-primary group py-4 pl-4 pr-7"
-              data-cursor="PLAY"
               onClick={() => {
                 blip(520);
                 openShowreel();
@@ -119,7 +118,6 @@ export function Hero() {
               {t.hero.play}
             </button>
           </Magnetic>
-          <span className="font-mono text-xs text-paper/40">{site.location}</span>
         </motion.div>
       </div>
 

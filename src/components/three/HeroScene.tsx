@@ -101,13 +101,11 @@ function playGeometry() {
 }
 
 /**
- * A single glass play button: the simplest possible sign for "video", lit from
- * inside, with a playhead orbiting it like a timeline wrapped into a loop.
+ * A single glass play button: the simplest possible sign for "video", lit from inside.
  */
 function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; mobile: boolean }) {
   const root = useRef<THREE.Group>(null);
   const button = useRef<THREE.Group>(null);
-  const orbit = useRef<THREE.Group>(null);
   const innerGlow = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
   const small = viewport.width < 7;
@@ -119,11 +117,9 @@ function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; 
   const innerTex = useMemo(() => glowTexture(LOOK.inner[0], LOOK.inner[1]), []);
   const haloTex = useMemo(() => glowTexture(LOOK.halo[0], LOOK.halo[1]), []);
   const edgeColor = useMemo(() => new THREE.Color(LOOK.edge).multiplyScalar(1.6), []);
-  const dotColor = useMemo(() => new THREE.Color('#FA7E1E').multiplyScalar(3), []);
-  const ringColor = useMemo(() => new THREE.Color('#C9A8FF').multiplyScalar(1.3), []);
 
-  const scale = small ? Math.min(0.5, viewport.width / 6) : Math.min(0.78, viewport.width / 12.5);
-  const baseX = small ? 0 : viewport.width * 0.29;
+  const scale = small ? Math.min(0.5, viewport.width / 6) : Math.min(0.68, viewport.width / 14);
+  const baseX = small ? 0 : viewport.width * 0.31;
   const baseY = small ? viewport.height * 0.27 : 0;
 
   useFrame((state, delta) => {
@@ -144,8 +140,6 @@ function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; 
       b.rotation.y = THREE.MathUtils.damp(b.rotation.y, (small ? -0.25 : -0.45) + px * 0.45 + Math.sin(t * 0.4) * 0.12 + p * 1.6, 2.5, delta);
       b.rotation.x = THREE.MathUtils.damp(b.rotation.x, 0.1 - py * 0.3, 2.5, delta);
     }
-    // the playhead runs around faster as you scroll
-    if (orbit.current) orbit.current.rotation.z -= delta * (0.5 + p * 4);
     if (innerGlow.current) innerGlow.current.scale.setScalar(1 + Math.sin(t * 1.6) * 0.06);
   });
 
@@ -181,19 +175,6 @@ function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; 
         </mesh>
       </group>
 
-      {/* timeline ring with a playhead */}
-      <group rotation={[1.2, 0.3, 0]}>
-        <mesh>
-          <torusGeometry args={[2.4, 0.008, 8, 200]} />
-          <meshBasicMaterial color={ringColor} toneMapped={false} />
-        </mesh>
-        <group ref={orbit}>
-          <mesh position={[2.4, 0, 0]}>
-            <sphereGeometry args={[0.07, 16, 16]} />
-            <meshBasicMaterial color={dotColor} toneMapped={false} />
-          </mesh>
-        </group>
-      </group>
       {!mobile && <pointLight position={[-2, 2, 3]} color="#D62976" intensity={20} />}
     </group>
   );
