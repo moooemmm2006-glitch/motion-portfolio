@@ -2,7 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { process, services } from '@/data/services';
+import { services } from '@/data/services';
 import { t } from '@/data/dictionary';
 import type { Service } from '@/data/types';
 import { SectionHeading } from '@/components/ui/SectionHeading';
@@ -74,45 +74,6 @@ function ServiceCard({ service, i }: { service: Service; i: number }) {
   );
 }
 
-function ProcessTimeline() {
-  return (
-    <div className="mt-32">
-      <p className="eyebrow mb-10">{t.services.process}</p>
-      <div className="overflow-x-auto pb-4" tabIndex={0} aria-label="Process timeline">
-        <div className="relative min-w-[900px]">
-          {/* Time ruler */}
-          <div className="flex justify-between border-b border-white/10 pb-2 font-mono text-[10px] text-paper/30">
-            {process.map((_, i) => (
-              <span key={i}>{`0:00:${pad(i * 4)}:00`}</span>
-            ))}
-            <span>0:00:24:00</span>
-          </div>
-          <ol className="relative mt-6 grid grid-cols-6 gap-2">
-            {process.map((p, i) => (
-              <motion.li
-                key={p.step}
-                initial={{ opacity: 0, scaleX: 0 }}
-                whileInView={{ opacity: 1, scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.9, ease: expoOut, delay: i * 0.12 }}
-                className="origin-left"
-              >
-                {/* Layer bar with keyframes */}
-                <div className="relative flex h-10 items-center rounded-md px-3" style={{ background: `hsl(${250 - i * 30} 70% 60% / 0.18)`, borderLeft: `3px solid hsl(${250 - i * 30} 80% 65%)` }}>
-                  <span className="truncate font-mono text-xs">{p.step}</span>
-                  <span className="absolute -bottom-[5px] left-2 h-2.5 w-2.5 rotate-45 bg-paper" />
-                  <span className="absolute -bottom-[5px] right-2 h-2.5 w-2.5 rotate-45 bg-paper/60" />
-                </div>
-                <p className="mt-6 pr-4 text-sm text-paper/50">{p.text}</p>
-              </motion.li>
-            ))}
-          </ol>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function Services() {
   return (
     <section id="services" className="relative py-28 md:py-40" aria-labelledby="services-title">
@@ -123,7 +84,6 @@ export function Services() {
             <ServiceCard key={s.title} service={s} i={i} />
           ))}
         </div>
-        <ProcessTimeline />
       </div>
     </section>
   );

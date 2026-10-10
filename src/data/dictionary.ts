@@ -15,7 +15,7 @@ export const en = {
     empty: 'No projects in this category yet.',
     dragHint: 'Drag or use the arrows to browse',
   },
-  services: { eyebrow: 'Services', heading: 'What I can make for you.', process: 'How I work' },
+  services: { eyebrow: 'Services', heading: 'What I can make for you.' },
   contact: {
     eyebrow: 'Contact',
     heading: "Let's make something that moves.",

@@ -10,11 +10,3 @@ export const services: Service[] = [
   { title: 'VFX & Compositing', icon: 'vfx', description: 'Tracking, rotoscoping, clean-ups and CG integration that nobody will notice. That is the point.' },
 ];
 
-export const process = [
-  { step: 'Brief', text: 'We align on goals, audience, references and deadlines.' },
-  { step: 'Script / Storyboard', text: 'Structure, style frames and an animatic before any heavy lifting.' },
-  { step: 'Edit', text: 'Story, pacing and sound come together in the rough cut.' },
-  { step: 'Motion & VFX', text: 'Graphics, compositing and the polish that makes it premium.' },
-  { step: 'Revisions', text: 'Two focused review rounds with frame-accurate notes.' },
-  { step: 'Delivery', text: 'Masters and cutdowns in every format, ready to publish.' },
-];
