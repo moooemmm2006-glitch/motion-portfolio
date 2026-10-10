@@ -43,7 +43,7 @@ export const en = {
     },
     wa: { hi: "Hi Ahmed, I'm", email: 'Email', type: 'Project type', budget: 'Budget' },
   },
-  footer: { top: 'Rewind to top', rights: 'All rights reserved.', menu: 'Menu', connect: 'Connect' },
+  footer: { top: 'Rewind to top', rights: 'All rights reserved.', menu: 'Menu', connect: 'Connect', credit: 'Created by', creator: 'Mohamed Emad' },
   video: { all: 'Videos', prev: 'PREV', next: 'NEXT', close: 'ESC · CLOSE' },
   project: {
     back: 'All work',
@@ -103,7 +103,7 @@ export const ar: Dictionary = {
     },
     wa: { hi: 'مرحباً أحمد، أنا', email: 'البريد', type: 'نوع المشروع', budget: 'الميزانية' },
   },
-  footer: { top: 'العودة للأعلى', rights: 'جميع الحقوق محفوظة.', menu: 'القائمة', connect: 'تواصل' },
+  footer: { top: 'العودة للأعلى', rights: 'جميع الحقوق محفوظة.', menu: 'القائمة', connect: 'تواصل', credit: 'تصميم وتطوير', creator: 'محمد عماد' },
   video: { all: 'الأعمال', prev: 'السابق', next: 'التالي', close: 'إغلاق' },
   project: {
     back: 'كل الأعمال',

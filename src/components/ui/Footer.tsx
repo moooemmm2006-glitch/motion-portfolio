@@ -16,7 +16,7 @@ export function Footer() {
   const [rewinding, setRewinding] = useState(false);
 
   return (
-    <footer className="relative border-t hairline pb-10 pt-20">
+    <footer className="relative border-t hairline pb-24 pt-20 md:pb-10">
       <div className="container-x">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           <div>
@@ -75,6 +75,17 @@ export function Footer() {
           <p className="text-xs text-paper/40">
             © {new Date().getFullYear()} {site.name}. {t.footer.rights}
           </p>
+        </div>
+
+        <div className="mt-10 flex items-center justify-center gap-4 border-t hairline pt-8">
+          <span className="h-px w-10 bg-gradient-to-r from-transparent to-white/25 rtl:bg-gradient-to-l" aria-hidden />
+          <p className="flex items-baseline gap-2.5 text-center">
+            <span className="text-[0.7rem] uppercase tracking-[0.3em] text-paper/45 rtl:text-xs rtl:normal-case rtl:tracking-normal">
+              {t.footer.credit}
+            </span>
+            <span className="text-gradient font-display text-base font-semibold tracking-wide rtl:tracking-normal">{t.footer.creator}</span>
+          </p>
+          <span className="h-px w-10 bg-gradient-to-l from-transparent to-white/25 rtl:bg-gradient-to-r" aria-hidden />
         </div>
       </div>
     </footer>
