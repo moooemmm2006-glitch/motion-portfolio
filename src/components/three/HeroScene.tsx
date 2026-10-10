@@ -129,8 +129,9 @@ function PlayButton({ progress, mobile, rtl }: { progress: MutableRefObject<numb
     if (!g) return;
     const p = progress.current;
     const t = state.clock.elapsedTime;
-    const px = small ? Math.sin(t * 0.45) * 0.6 + tilt.current.x : pointer.x;
-    const py = small ? Math.cos(t * 0.35) * 0.5 + tilt.current.y : pointer.y;
+    // phones: a slow, small sway only, so reflections drift instead of flashing on and off
+    const px = small ? Math.sin(t * 0.3) * 0.2 + tilt.current.x * 0.3 : pointer.x;
+    const py = small ? Math.cos(t * 0.25) * 0.15 + tilt.current.y * 0.3 : pointer.y;
 
     g.position.x = THREE.MathUtils.damp(g.position.x, baseX + px * 0.15, 3, delta);
     g.position.y = THREE.MathUtils.damp(g.position.y, baseY + Math.sin(t * 0.8) * 0.06 + p * 0.8, 3, delta);
@@ -139,10 +140,10 @@ function PlayButton({ progress, mobile, rtl }: { progress: MutableRefObject<numb
 
     if (button.current) {
       const b = button.current;
-      b.rotation.y = THREE.MathUtils.damp(b.rotation.y, (small ? -0.25 : -0.45) + px * 0.45 + Math.sin(t * 0.4) * 0.12 + p * 1.6, 2.5, delta);
+      b.rotation.y = THREE.MathUtils.damp(b.rotation.y, (small ? -0.25 : -0.45) + px * 0.45 + (small ? 0 : Math.sin(t * 0.4) * 0.12) + p * 1.6, 2.5, delta);
       b.rotation.x = THREE.MathUtils.damp(b.rotation.x, 0.1 - py * 0.3, 2.5, delta);
     }
-    if (innerGlow.current) innerGlow.current.scale.setScalar(1 + Math.sin(t * 1.6) * 0.06);
+    if (innerGlow.current && !small) innerGlow.current.scale.setScalar(1 + Math.sin(t * 1.6) * 0.06);
   });
 
   return (
@@ -161,9 +162,9 @@ function PlayButton({ progress, mobile, rtl }: { progress: MutableRefObject<numb
             transparent
             opacity={LOOK.glassOpacity}
             clearcoat={1}
-            iridescence={0.5}
+            iridescence={small ? 0 : 0.5}
             iridescenceIOR={1.5}
-            envMapIntensity={1.4}
+            envMapIntensity={small ? 1 : 1.4}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -193,13 +194,13 @@ export default function HeroScene({ progress, active, mobile, rtl }: Props) {
   return (
     <Canvas
       frameloop={active ? 'always' : 'never'}
-      dpr={mobile ? [1, 1.75] : [1, 2]}
+      dpr={mobile ? 1.5 : [1, 2]}
       camera={{ position: [0, 0, 7], fov: 35 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       aria-hidden
     >
       <PerformanceMonitor onDecline={() => setQuality('low')} onIncline={() => !mobile && setQuality('high')} />
-      <AdaptiveDpr pixelated={false} />
+      {!mobile && <AdaptiveDpr pixelated={false} />}
       <Rig />
       <ambientLight intensity={0.5} />
       <pointLight position={[2, 2, 3]} color="#9999FF" intensity={30} />
@@ -224,7 +225,7 @@ export default function HeroScene({ progress, active, mobile, rtl }: Props) {
         </EffectComposer>
       ) : (
         <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={1} luminanceThreshold={0.7} />
+          <Bloom mipmapBlur intensity={mobile ? 0.6 : 1} luminanceThreshold={mobile ? 0.85 : 0.7} />
           <Vignette eskil={false} offset={0.25} darkness={0.7} />
         </EffectComposer>
       )}

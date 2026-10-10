@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { site, whatsappUrl } from '@/data/site';
+import { openWhatsApp, site, whatsappUrl } from '@/data/site';
 import { useContent, useLang } from '@/components/providers/LangProvider';
 import { budgets, makeContactSchema, projectTypes, type ContactInput } from '@/lib/contact-schema';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
@@ -73,9 +73,11 @@ export function Contact() {
       '',
       data.message,
     ].join('\n');
-    const url = whatsappUrl(text);
-    const win = window.open(url, '_blank', 'noopener');
-    if (!win) window.location.href = url;
+    if (!openWhatsApp(text)) {
+      const url = whatsappUrl(text);
+      const win = window.open(url, '_blank', 'noopener');
+      if (!win) window.location.href = url;
+    }
     setStatus('sent');
     reset();
   };

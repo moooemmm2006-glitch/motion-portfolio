@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { site, whatsappUrl } from '@/data/site';
+import { openWhatsApp, site, whatsappUrl } from '@/data/site';
 import { useLang } from '@/components/providers/LangProvider';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,7 @@ export function WhatsAppIcon({ className }: { className?: string }) {
 /** Direct WhatsApp link with the logo, used everywhere people can reach out. */
 export function WhatsAppLink({ className, label, text }: { className?: string; label?: ReactNode; text?: string }) {
   return (
-    <a href={whatsappUrl(text)} target="_blank" rel="noreferrer" className={cn('inline-flex items-center gap-2', className)} aria-label={`WhatsApp ${site.phoneDisplay}`}>
+    <a href={whatsappUrl(text)} onClick={(e) => openWhatsApp(text) && e.preventDefault()} target="_blank" rel="noreferrer" className={cn('inline-flex items-center gap-2', className)} aria-label={`WhatsApp ${site.phoneDisplay}`}>
       <WhatsAppIcon className="text-[#25D366]" />
       <span>{label ?? <bdi dir="ltr">{site.phoneDisplay}</bdi>}</span>
     </a>
@@ -29,6 +29,7 @@ export function WhatsAppFloat() {
   return (
     <a
       href={whatsappUrl(t.waGreeting)}
+      onClick={(e) => openWhatsApp(t.waGreeting) && e.preventDefault()}
       target="_blank"
       rel="noreferrer"
       aria-label={`Chat on WhatsApp ${site.phoneDisplay}`}
@@ -62,7 +63,7 @@ export function SocialIcons({ className }: { className?: string }) {
   return (
     <ul className={cn('flex flex-wrap items-center gap-3', className)}>
       <li>
-        <a href={whatsappUrl()} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={cn(base, 'hover:bg-[#25D366]')}>
+        <a href={whatsappUrl()} onClick={(e) => openWhatsApp() && e.preventDefault()} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={cn(base, 'hover:bg-[#25D366]')}>
           <WhatsAppIcon className="h-5 w-5" />
         </a>
       </li>

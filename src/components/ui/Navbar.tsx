@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { nav, site, whatsappUrl } from '@/data/site';
+import { nav, openWhatsApp, site, whatsappUrl } from '@/data/site';
 import { useUI } from '@/components/providers/UIProvider';
 import { useLang } from '@/components/providers/LangProvider';
 import { useLenis } from '@/components/providers/SmoothScroll';
@@ -90,7 +90,7 @@ export function Navbar() {
             </button>
             <LangSwitch lang={lang} onChange={setLang} />
             <Magnetic className="hidden md:inline-block">
-              <a href={whatsappUrl(t.waGreeting)} target="_blank" rel="noreferrer" className="btn-primary gap-2">
+              <a href={whatsappUrl(t.waGreeting)} onClick={(e) => openWhatsApp(t.waGreeting) && e.preventDefault()} target="_blank" rel="noreferrer" className="btn-primary gap-2">
                 <WhatsAppIcon className="text-[#25D366]" />
                 {t.letsTalk}
               </a>

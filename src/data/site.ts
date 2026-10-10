@@ -48,8 +48,26 @@ export const site = {
 } as const;
 
 /** wa.me link straight into a chat, optionally with a prefilled message. */
-export const whatsappUrl = (text?: string) =>
-  `https://wa.me/${site.whatsapp.replace(/\D/g, '')}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+const waPhone = site.whatsapp.replace(/\D/g, '');
+const waQuery = (text?: string) => `phone=${waPhone}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
+
+/** Web link (api.whatsapp.com skips the extra wa.me redirect). */
+export const whatsappUrl = (text?: string) => `https://api.whatsapp.com/send?${waQuery(text)}`;
+
+/**
+ * On phones, jump straight into the WhatsApp app instead of loading WhatsApp's web page first
+ * (that page is what made the tap take several seconds). Falls back to the web link if the app
+ * isn't installed. Returns true when it handled the tap.
+ */
+export function openWhatsApp(text?: string): boolean {
+  if (typeof window === 'undefined' || !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return false;
+  const fallback = setTimeout(() => {
+    if (document.visibilityState === 'visible') window.location.href = whatsappUrl(text);
+  }, 1500);
+  document.addEventListener('visibilitychange', () => clearTimeout(fallback), { once: true });
+  window.location.href = `whatsapp://send?${waQuery(text)}`;
+  return true;
+}
 
 export const nav = [
   { label: 'Work', href: '/#work' },
