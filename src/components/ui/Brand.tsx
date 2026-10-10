@@ -32,10 +32,10 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noreferrer"
       aria-label={`Chat on WhatsApp ${site.phoneDisplay}`}
-      className="group fixed bottom-24 end-5 z-[65] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_40px_-8px_rgba(37,211,102,0.65)] transition-transform duration-300 hover:scale-110 md:bottom-24 md:end-8"
+      className="group fixed bottom-5 end-4 z-[65] flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_40px_-8px_rgba(37,211,102,0.65)] transition-transform duration-300 hover:scale-110 md:bottom-24 md:end-8"
     >
       <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-25" />
-      <WhatsAppIcon className="relative h-7 w-7" />
+      <WhatsAppIcon className="relative h-6 w-6 md:h-7 md:w-7" />
     </a>
   );
 }

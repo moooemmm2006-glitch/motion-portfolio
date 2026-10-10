@@ -58,6 +58,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image', title: `${site.name} — ${site.title}`, description },
   alternates: { canonical: '/' },
+  other: { google: 'notranslate' },
 };
 
 export const viewport: Viewport = {
@@ -84,6 +85,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang={en.locale}
       dir={en.dir}
+      // Phones set to Arabic auto-translate the English page into broken Arabic;
+      // the site has its own Arabic version, so turn browser translation off.
+      translate="no"
       className={`${display.variable} ${sans.variable} ${arDisplay.variable} ${arSans.variable}`}
     >
       <body>
