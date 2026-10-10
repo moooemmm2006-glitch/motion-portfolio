@@ -34,3 +34,53 @@ export function WhatsAppFloat() {
     </a>
   );
 }
+
+const SOCIAL_PATHS = {
+  Instagram:
+    'M12 2.2c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.58 2.2 15.2 2.2 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.21 8.8 2.2 12 2.2Zm0 4.66a5.14 5.14 0 1 0 0 10.28 5.14 5.14 0 0 0 0-10.28Zm0 8.48a3.34 3.34 0 1 1 0-6.68 3.34 3.34 0 0 1 0 6.68Zm5.34-9.9a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z',
+  Facebook:
+    'M13.5 21.9v-7.4h2.5l.38-2.9H13.5V9.76c0-.84.23-1.41 1.44-1.41h1.54V5.76a20.6 20.6 0 0 0-2.24-.11c-2.22 0-3.74 1.35-3.74 3.84v2.14H8v2.9h2.5v7.4h3Z',
+  TikTok:
+    'M16.6 2h-3.27v13.3a2.86 2.86 0 1 1-2.86-2.87c.28 0 .55.04.8.12V9.21a6.15 6.15 0 1 0 5.33 6.1V8.6a7.9 7.9 0 0 0 4.6 1.47V6.8a4.6 4.6 0 0 1-4.6-4.6V2Z',
+} as const;
+
+const SOCIAL_HOVER = {
+  Instagram: 'hover:bg-[linear-gradient(45deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5)]',
+  Facebook: 'hover:bg-[#1877F2]',
+  TikTok: 'hover:bg-[#111] hover:shadow-[-2px_-2px_0_#25F4EE,2px_2px_0_#FE2C55]',
+} as const;
+
+/** Round logo buttons: WhatsApp first, then the social platforms. */
+export function SocialIcons({ className }: { className?: string }) {
+  const base =
+    'flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-paper transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent';
+  return (
+    <ul className={cn('flex flex-wrap items-center gap-3', className)}>
+      <li>
+        <a href={whatsappUrl()} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={cn(base, 'hover:bg-[#25D366]')}>
+          <WhatsAppIcon className="h-5 w-5" />
+        </a>
+      </li>
+      {site.socials.map((s) => {
+        const icon = (
+          <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5 fill-current">
+            <path d={SOCIAL_PATHS[s.label]} />
+          </svg>
+        );
+        return (
+          <li key={s.label}>
+            {s.href ? (
+              <a href={s.href} target="_blank" rel="noreferrer" aria-label={s.label} className={cn(base, SOCIAL_HOVER[s.label])}>
+                {icon}
+              </a>
+            ) : (
+              <span role="img" aria-label={s.label} title={s.label} className={cn(base, SOCIAL_HOVER[s.label])}>
+                {icon}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

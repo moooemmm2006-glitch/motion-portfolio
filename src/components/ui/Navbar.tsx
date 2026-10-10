@@ -9,7 +9,7 @@ import { cineInOut, expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
-import { WhatsAppIcon, WhatsAppLink } from './Brand';
+import { WhatsAppIcon, SocialIcons, WhatsAppLink } from './Brand';
 
 export function Navbar() {
   const [hidden, setHidden] = useState(false);
@@ -135,13 +135,7 @@ export function Navbar() {
               ))}
             </ul>
             <WhatsAppLink className="mb-6 text-lg text-paper" />
-            <div className="flex flex-wrap gap-4 text-sm text-paper/60">
-              {site.socials.map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noreferrer">
-                  {s.label}
-                </a>
-              ))}
-            </div>
+            <SocialIcons />
           </motion.div>
         )}
       </AnimatePresence>

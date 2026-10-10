@@ -7,7 +7,7 @@ import { t } from '@/data/dictionary';
 import { useScrollTo } from '@/components/providers/SmoothScroll';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
-import { WhatsAppLink } from './Brand';
+import { SocialIcons, WhatsAppLink } from './Brand';
 
 export function Footer() {
   const scrollTo = useScrollTo();
@@ -37,16 +37,8 @@ export function Footer() {
             </ul>
           </nav>
           <div>
-            <p className="eyebrow mb-4">Social</p>
-            <ul className="space-y-2">
-              {site.socials.map((s) => (
-                <li key={s.label}>
-                  <a href={s.href} target="_blank" rel="noreferrer" className="text-paper/70 hover:text-paper">
-                    {s.label} ↗
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p className="eyebrow mb-4">Connect</p>
+            <SocialIcons />
           </div>
         </div>
 

@@ -14,7 +14,7 @@ import { Magnetic } from '@/components/ui/Magnetic';
 import { SplitText } from '@/components/ui/SplitText';
 import { expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
-import { WhatsAppLink } from '@/components/ui/Brand';
+import { SocialIcons, WhatsAppLink } from '@/components/ui/Brand';
 
 const ContactScene = dynamic(() => import('@/components/three/ContactScene'), { ssr: false });
 
@@ -86,7 +86,7 @@ export function Contact() {
       </div>
 
       <div className="container-x">
-        <p className="eyebrow mb-6">05 — {t.contact.eyebrow}</p>
+        <p className="eyebrow mb-6">04 — {t.contact.eyebrow}</p>
         <h2 id="contact-title" className="display max-w-6xl text-[clamp(3rem,10vw,9.5rem)]">
           <SplitText text={t.contact.heading} by="words" />
         </h2>
@@ -101,15 +101,7 @@ export function Contact() {
                 <WhatsAppLink className="btn-primary" label={`WhatsApp · ${site.phoneDisplay}`} text="Hi Ahmed, I'd like to talk about a project" />
               </Magnetic>
             </div>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-paper/60">
-              {site.socials.map((s) => (
-                <li key={s.label}>
-                  <a href={s.href} target="_blank" rel="noreferrer" className="hover:text-paper">
-                    {s.label} ↗
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <SocialIcons />
           </div>
 
           <motion.form

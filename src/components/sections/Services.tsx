@@ -117,7 +117,7 @@ export function Services() {
   return (
     <section id="services" className="relative py-28 md:py-40" aria-labelledby="services-title">
       <div className="container-x">
-        <SectionHeading id="services-title" index="04" eyebrow={t.services.eyebrow} title={t.services.heading} />
+        <SectionHeading id="services-title" index="03" eyebrow={t.services.eyebrow} title={t.services.heading} />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => (
             <ServiceCard key={s.title} service={s} i={i} />

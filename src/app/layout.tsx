@@ -48,7 +48,7 @@ const personLd = {
   telephone: site.whatsapp,
   url: site.url,
   image: `${site.url}${site.portrait}`,
-  sameAs: site.socials.map((s) => s.href),
+  sameAs: site.socials.map((s) => s.href).filter(Boolean),
   knowsAbout: site.tools.map((t) => t.name),
 };
 

@@ -24,13 +24,12 @@ export const site = {
     src: '/videos/ai-sales-roleplay.mp4',
     poster: '/posters/ai-sales-roleplay.jpg',
   } satisfies VideoSource as VideoSource,
+  /** Leave href empty until the account exists: the logo shows without a link. */
   socials: [
-    { label: 'Instagram', href: 'https://instagram.com/[handle]' },
-    { label: 'Behance', href: 'https://behance.net/[handle]' },
-    { label: 'Vimeo', href: 'https://vimeo.com/[handle]' },
-    { label: 'YouTube', href: 'https://youtube.com/@[handle]' },
-    { label: 'LinkedIn', href: 'https://linkedin.com/in/[handle]' },
-  ],
+    { label: 'Instagram', href: '' },
+    { label: 'Facebook', href: '' },
+    { label: 'TikTok', href: '' },
+  ] as { label: 'Instagram' | 'Facebook' | 'TikTok'; href: string }[],
   stats: [
     { value: 7, suffix: '+', label: 'Years experience' },
     { value: 250, suffix: '+', label: 'Projects delivered' },
@@ -55,7 +54,6 @@ export const whatsappUrl = (text?: string) =>
 export const nav = [
   { label: 'Work', href: '/#work' },
   { label: 'About', href: '/#about' },
-  { label: 'Clients', href: '/#clients' },
   { label: 'Services', href: '/#services' },
   { label: 'Contact', href: '/#contact' },
 ];
