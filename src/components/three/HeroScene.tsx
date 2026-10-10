@@ -1,24 +1,15 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import {
-  AdaptiveDpr,
-  Environment,
-  Float,
-  Lightformer,
-  MeshTransmissionMaterial,
-  PerformanceMonitor,
-  Sparkles,
-  useTexture,
-  useVideoTexture,
-} from '@react-three/drei';
+import { AdaptiveDpr, PerformanceMonitor, Sparkles, useTexture } from '@react-three/drei';
 import { Bloom, ChromaticAberration, EffectComposer, Vignette } from '@react-three/postprocessing';
-import { Suspense, useEffect, useRef, useState, type MutableRefObject } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import * as THREE from 'three';
-import { site } from '@/data/site';
+import { projects } from '@/data/projects';
+import { filmStripFragment, filmStripVertex } from '@/shaders/filmStrip';
 
 type Quality = 'high' | 'low';
-const CA_OFFSET = new THREE.Vector2(0.0009, 0.0006);
+const CA_OFFSET = new THREE.Vector2(0.0008, 0.0005);
 
 interface Props {
   /** 0 at top of page, 1 when the hero has scrolled away. */
@@ -27,26 +18,7 @@ interface Props {
   mobile: boolean;
 }
 
-/** Shows the poster immediately, then swaps to the playing showreel once it can play. */
-function ShowreelMaterial() {
-  const reel = site.showreel;
-  const poster = useTexture(reel.poster ?? '/posters/showreel.jpg');
-  poster.colorSpace = THREE.SRGBColorSpace;
-  const posterMat = <meshBasicMaterial map={poster} toneMapped={false} />;
-  if (reel.type !== 'file') return posterMat;
-  return (
-    <Suspense fallback={posterMat}>
-      <VideoMat src={reel.src} />
-    </Suspense>
-  );
-}
-
-function VideoMat({ src }: { src: string }) {
-  const texture = useVideoTexture(src, { muted: true, loop: true, start: true, playsInline: true, crossOrigin: 'anonymous' });
-  return <meshBasicMaterial map={texture} toneMapped={false} />;
-}
-
-/** Phone tilt as -1..1 (Android gives it freely; iOS only after a permission tap, so it's simply 0 there). */
+/** Phone tilt as -1..1 (Android gives it freely; iOS needs a permission tap, so it stays 0 there). */
 function useDeviceTilt(enabled: boolean) {
   const tilt = useRef({ x: 0, y: 0 });
   useEffect(() => {
@@ -62,104 +34,138 @@ function useDeviceTilt(enabled: boolean) {
   return tilt;
 }
 
-/** A stylized camera lens: metal barrel, glowing ring, the showreel inside and a glass front element. */
-function Lens({ progress, quality }: { progress: MutableRefObject<number>; quality: Quality }) {
+/** Infinity-shaped closed path the film runs along. */
+const infinityPoint = (t: number, target: THREE.Vector3) => {
+  const a = t * Math.PI * 2;
+  return target.set(Math.sin(a) * 2.6, Math.sin(a) * Math.cos(a) * 1.5, Math.cos(a) * 1.1);
+};
+
+/** Build a flat ribbon along the curve with one full twist, UV.x along the loop, UV.y across. */
+function useRibbon(segments: number, width: number) {
+  return useMemo(() => {
+    const ahead = new THREE.Vector3();
+    const pos: number[] = [];
+    const uv: number[] = [];
+    const idx: number[] = [];
+    const up = new THREE.Vector3(0, 1, 0);
+    const p = new THREE.Vector3();
+    const tan = new THREE.Vector3();
+    const side = new THREE.Vector3();
+    const nrm = new THREE.Vector3();
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      infinityPoint(t, p);
+      tan.subVectors(infinityPoint(t + 0.0005, ahead), p).normalize();
+      nrm.crossVectors(tan, up).normalize();
+      side.crossVectors(nrm, tan).normalize();
+      // one full twist so the loop closes seamlessly
+      const twist = t * Math.PI * 2;
+      const dir = side.clone().multiplyScalar(Math.cos(twist)).addScaledVector(nrm, Math.sin(twist));
+      for (const s of [-0.5, 0.5]) {
+        pos.push(p.x + dir.x * width * s, p.y + dir.y * width * s, p.z + dir.z * width * s);
+        uv.push(t, s + 0.5);
+      }
+      if (i < segments) {
+        const k = i * 2;
+        idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+      }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  }, [segments, width]);
+}
+
+/** Packs up to 9 project posters into one 3x3 texture. */
+function usePosterAtlas() {
+  const posters = useMemo(() => projects.slice(0, 9).map((p) => p.poster), []);
+  const images = useTexture(posters);
+  return useMemo(() => {
+    const cw = 512;
+    const ch = 288;
+    const canvas = document.createElement('canvas');
+    canvas.width = cw * 3;
+    canvas.height = ch * 3;
+    const ctx = canvas.getContext('2d')!;
+    images.forEach((tex, i) => {
+      const img = tex.image as HTMLImageElement;
+      const x = (i % 3) * cw;
+      const y = Math.floor(i / 3) * ch;
+      // cover-fit each poster into its cell
+      const s = Math.max(cw / img.width, ch / img.height);
+      const w = img.width * s;
+      const h = img.height * s;
+      ctx.drawImage(img, x + (cw - w) / 2, y + (ch - h) / 2, w, h);
+    });
+    const atlas = new THREE.CanvasTexture(canvas);
+    atlas.colorSpace = THREE.SRGBColorSpace;
+    atlas.anisotropy = 4;
+    return { atlas, cells: images.length };
+  }, [images]);
+}
+
+/** The work itself, running as an endless strip of film: the editor's timeline made physical. */
+function FilmLoop({ progress, mobile }: { progress: MutableRefObject<number>; mobile: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const ring = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
   const small = viewport.width < 7;
-  // on narrow screens: shrink the lens and lift it above the headline
-  const scale = small ? Math.min(0.8, viewport.width / 4.2) : 0.9;
-  const baseY = small ? viewport.height * 0.27 : 0;
-  const baseX = small ? 0 : viewport.width * 0.25;
   const tilt = useDeviceTilt(small);
+  const geometry = useRibbon(mobile ? 500 : 900, 0.95);
+  const { atlas, cells } = usePosterAtlas();
+  const uniforms = useMemo(
+    () => ({
+      uAtlas: { value: atlas },
+      uFrames: { value: 22 },
+      uFlow: { value: 0 },
+      uCells: { value: cells },
+      uTime: { value: 0 },
+    }),
+    [atlas, cells],
+  );
+
+  const scale = small ? Math.min(0.75, viewport.width / 6.2) : 0.78;
+  const baseX = small ? 0 : viewport.width * 0.24;
+  const baseY = small ? viewport.height * 0.24 : 0;
 
   useFrame((state, delta) => {
     const g = group.current;
     if (!g) return;
     const p = progress.current;
-    // touch screens have no hover, so the lens drifts on its own (plus device tilt when allowed)
     const t = state.clock.elapsedTime;
-    const px = small ? Math.sin(t * 0.6) * 0.6 + tilt.current.x : pointer.x;
-    const py = small ? Math.cos(t * 0.45) * 0.4 + tilt.current.y : pointer.y;
-    // mouse parallax + subtle rotation, eased like an AE Easy Ease
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, px * 0.45 - (small ? 0 : 0.35) + p * 0.6, 3, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, -py * 0.3 + 0.12, 3, delta);
-    g.position.x = THREE.MathUtils.damp(g.position.x, baseX + px * (small ? 0.12 : 0.25), 3, delta);
-    g.position.y = THREE.MathUtils.damp(g.position.y, baseY + p * 1.2, 3, delta);
-    // scroll: fly toward the camera
+    // film runs forward; scrolling speeds it up like scrubbing the timeline
+    uniforms.uFlow.value += delta * (0.55 + p * 6);
+    uniforms.uTime.value = t;
+
+    const px = small ? Math.sin(t * 0.5) * 0.5 + tilt.current.x : pointer.x;
+    const py = small ? Math.cos(t * 0.4) * 0.35 + tilt.current.y : pointer.y;
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, -0.5 + px * 0.5 + Math.sin(t * 0.15) * 0.15 + p * 1.2, 2.5, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, 0.35 - py * 0.3, 2.5, delta);
+    g.rotation.z = THREE.MathUtils.damp(g.rotation.z, -0.18 + Math.sin(t * 0.2) * 0.05, 2.5, delta);
+    g.position.x = THREE.MathUtils.damp(g.position.x, baseX + px * 0.2, 3, delta);
+    g.position.y = THREE.MathUtils.damp(g.position.y, baseY + p * 1.0, 3, delta);
+    // scroll: the loop rushes toward the camera
     g.position.z = THREE.MathUtils.damp(g.position.z, p * 4.5, 4, delta);
-    if (ring.current) ring.current.rotation.z += delta * 0.4;
-    state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, -p * 0.8, 3, delta);
   });
 
   return (
-    <group ref={group} scale={scale} position={[baseX, baseY, 0]}>
-      <Float speed={1.4} rotationIntensity={0.25} floatIntensity={0.6}>
-        {/* Barrel */}
-        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.55]}>
-          <cylinderGeometry args={[1.45, 1.55, 1.1, 96, 1, true]} />
-          <meshStandardMaterial color="#121216" metalness={0.95} roughness={0.32} side={THREE.DoubleSide} />
-        </mesh>
-        {/* Grip grooves */}
-        {[-0.95, -0.75, -0.55, -0.35].map((z) => (
-          <mesh key={z} position={[0, 0, z]}>
-            <torusGeometry args={[1.56, 0.035, 12, 96]} />
-            <meshStandardMaterial color="#1c1c22" metalness={1} roughness={0.4} />
-          </mesh>
-        ))}
-        {/* Front bezel */}
-        <mesh position={[0, 0, 0]}>
-          <torusGeometry args={[1.42, 0.11, 24, 128]} />
-          <meshStandardMaterial color="#0d0d10" metalness={1} roughness={0.18} />
-        </mesh>
-        {/* Glowing AE-violet ring */}
-        <mesh ref={ring} position={[0, 0, 0.06]}>
-          <torusGeometry args={[1.28, 0.012, 8, 160]} />
-          <meshBasicMaterial color={new THREE.Color('#7B5CFF').multiplyScalar(4)} toneMapped={false} />
-        </mesh>
-        {/* Showreel playing inside the lens */}
-        <mesh position={[0, 0, -0.45]}>
-          <circleGeometry args={[1.4, 96]} />
-          <Suspense fallback={<meshBasicMaterial color="#1a1530" />}>
-            <ShowreelMaterial />
-          </Suspense>
-        </mesh>
-        {/* Glass front element (refracts the video behind it) */}
-        <mesh position={[0, 0, 0.02]} rotation={[Math.PI / 2, 0, 0]} scale={[1.36, 0.42, 1.36]}>
-          <sphereGeometry args={[1, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <MeshTransmissionMaterial
-            backside={false}
-            samples={quality === 'high' ? 8 : 3}
-            resolution={quality === 'high' ? 768 : 256}
-            thickness={0.5}
-            roughness={0.04}
-            ior={1.35}
-            chromaticAberration={0.6}
-            anisotropy={0.2}
-            distortion={0.25}
-            distortionScale={0.4}
-            temporalDistortion={0.08}
-            clearcoat={1}
-            attenuationColor="#d9d4ff"
-            attenuationDistance={6}
-            color="#ffffff"
-          />
-        </mesh>
-      </Float>
-      {/* Orbiting glass ring for depth */}
-      <Float speed={0.8} rotationIntensity={1.2} floatIntensity={1}>
-        <mesh position={[-1.4, -1.2, 0.8]} rotation={[0.6, 0.4, 0]}>
-          <torusGeometry args={[0.45, 0.14, 32, 96]} />
-          <MeshTransmissionMaterial samples={3} resolution={256} thickness={0.4} roughness={0.08} chromaticAberration={0.4} ior={1.4} color="#c9bfff" />
-        </mesh>
-      </Float>
+    <group ref={group} position={[baseX, baseY, 0]} scale={scale}>
+      <mesh geometry={geometry}>
+        <shaderMaterial
+          vertexShader={filmStripVertex}
+          fragmentShader={filmStripFragment}
+          uniforms={uniforms}
+          side={THREE.DoubleSide}
+          toneMapped={false}
+        />
+      </mesh>
     </group>
   );
 }
 
 function Rig() {
-  // keep the camera looking at the center while it drifts
   useFrame(({ camera }) => camera.lookAt(0, 0, 0));
   return null;
 }
@@ -170,51 +176,32 @@ export default function HeroScene({ progress, active, mobile }: Props) {
   return (
     <Canvas
       frameloop={active ? 'always' : 'never'}
-      dpr={mobile ? [1, 1.5] : [1, 2]}
+      dpr={mobile ? [1, 1.75] : [1, 2]}
       camera={{ position: [0, 0, 7], fov: 35 }}
-      gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       aria-hidden
     >
       <PerformanceMonitor onDecline={() => setQuality('low')} onIncline={() => !mobile && setQuality('high')} />
       <AdaptiveDpr pixelated={false} />
       <Rig />
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[3, 4, 5]} intensity={1.2} />
-      <pointLight position={[-4, -2, 2]} intensity={30} color="#FF6B3D" />
-      <pointLight position={[4, 2, 1]} intensity={30} color="#7B5CFF" />
 
       <Suspense fallback={null}>
-        <Lens progress={progress} quality={quality} />
-        {/* Procedural studio lighting (no HDR download) */}
-        <Environment resolution={256} frames={1}>
-          <Lightformer form="rect" intensity={3} position={[0, 4, -2]} scale={[10, 2, 1]} color="#ffffff" />
-          <Lightformer form="rect" intensity={4} position={[-5, 0, 2]} scale={[2, 8, 1]} color="#9999FF" />
-          <Lightformer form="rect" intensity={3} position={[5, -1, 2]} scale={[2, 6, 1]} color="#FF6B3D" />
-          <Lightformer form="ring" intensity={2} position={[0, 0, 6]} scale={3} color="#ffffff" />
-        </Environment>
+        <FilmLoop progress={progress} mobile={mobile} />
       </Suspense>
 
-      <Sparkles count={mobile ? 90 : 140} scale={[14, 8, 6]} size={mobile ? 2.5 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />
+      <Sparkles count={mobile ? 90 : 160} scale={[14, 8, 6]} size={mobile ? 2.5 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />
       <Sparkles count={mobile ? 20 : 30} scale={[16, 9, 4]} position={[0, 0, -3]} size={12} speed={0.1} opacity={0.15} color="#FF6B3D" />
 
-      {!mobile && quality === 'high' && (
+      {quality === 'high' && !mobile ? (
         <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.6} luminanceSmoothing={0.2} />
+          <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.7} luminanceSmoothing={0.2} />
           <ChromaticAberration offset={CA_OFFSET} radialModulation={false} modulationOffset={0} />
           <Vignette eskil={false} offset={0.25} darkness={0.75} />
         </EffectComposer>
-      )}
-      {/* Phones get a light pass: bloom on the glowing ring + vignette, no chromatic aberration */}
-      {mobile && (
+      ) : (
         <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.55} luminanceSmoothing={0.25} />
+          <Bloom mipmapBlur intensity={1} luminanceThreshold={0.7} />
           <Vignette eskil={false} offset={0.25} darkness={0.7} />
-        </EffectComposer>
-      )}
-      {!mobile && quality === 'low' && (
-        <EffectComposer multisampling={0}>
-          <Bloom mipmapBlur intensity={0.7} luminanceThreshold={0.7} />
-          <Vignette eskil={false} offset={0.25} darkness={0.75} />
         </EffectComposer>
       )}
     </Canvas>
