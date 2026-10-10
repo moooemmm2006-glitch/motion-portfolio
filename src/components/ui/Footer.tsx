@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { nav, site } from '@/data/site';
+import { creatorPhone, nav, openWhatsApp, site, whatsappUrl } from '@/data/site';
 import { useContent, useLang } from '@/components/providers/LangProvider';
 import { useScrollTo } from '@/components/providers/SmoothScroll';
 import { Magnetic } from './Magnetic';
@@ -77,7 +77,8 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-4 border-t hairline pt-8">
+        <div className="mt-10 flex flex-col items-center gap-3 border-t hairline pt-8">
+        <div className="flex items-center justify-center gap-4">
           <span className="h-px w-10 bg-gradient-to-r from-transparent to-white/25 rtl:bg-gradient-to-l" aria-hidden />
           <p className="flex items-baseline gap-2.5 text-center">
             <span className="text-[0.7rem] uppercase tracking-[0.3em] text-paper/45 rtl:text-xs rtl:normal-case rtl:tracking-normal">
@@ -86,6 +87,21 @@ export function Footer() {
             <span className="text-gradient font-display text-base font-semibold tracking-wide rtl:tracking-normal">{t.footer.creator}</span>
           </p>
           <span className="h-px w-10 bg-gradient-to-l from-transparent to-white/25 rtl:bg-gradient-to-r" aria-hidden />
+        </div>
+          <a
+            href={whatsappUrl(t.footer.creatorMsg, creatorPhone)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              if (openWhatsApp(t.footer.creatorMsg, creatorPhone)) e.preventDefault();
+            }}
+            className="group mt-1 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.03] py-2 pe-3 ps-4 text-[0.7rem] uppercase tracking-[0.25em] text-paper/75 backdrop-blur transition-all duration-300 hover:border-violet-soft/60 hover:bg-white/[0.07] hover:text-paper hover:shadow-[0_0_24px_-6px_rgba(155,133,255,0.6)] rtl:text-xs rtl:normal-case rtl:tracking-normal"
+          >
+            {t.footer.contact}
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-violet-soft to-ember text-[0.75rem] text-ink transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" aria-hidden>
+              ↗
+            </span>
+          </a>
         </div>
       </div>
     </footer>

@@ -16,6 +16,8 @@ export const site = {
   availability: 'Available for remote work worldwide',
   email: 'hello@example.com',
   whatsapp: '+201117651679',
+  /** Site credit in the footer links to the developer's WhatsApp. */
+  creatorWhatsapp: '+201096452755',
   phoneDisplay: '0111 765 1679',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://motion-portfolio-umber.vercel.app',
   portrait: '/images/portrait.jpg',
@@ -49,23 +51,23 @@ export const site = {
 
 /** wa.me link straight into a chat, optionally with a prefilled message. */
 const waPhone = site.whatsapp.replace(/\D/g, '');
-const waQuery = (text?: string) => `phone=${waPhone}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
+const waQuery = (text?: string, phone = waPhone) => `phone=${phone}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
 
 /** Web link (api.whatsapp.com skips the extra wa.me redirect). */
-export const whatsappUrl = (text?: string) => `https://api.whatsapp.com/send?${waQuery(text)}`;
+export const whatsappUrl = (text?: string, phone?: string) => `https://api.whatsapp.com/send?${waQuery(text, phone)}`;
 
 /**
  * On phones, jump straight into the WhatsApp app instead of loading WhatsApp's web page first
  * (that page is what made the tap take several seconds). Falls back to the web link if the app
  * isn't installed. Returns true when it handled the tap.
  */
-export function openWhatsApp(text?: string): boolean {
+export function openWhatsApp(text?: string, phone?: string): boolean {
   if (typeof window === 'undefined' || !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return false;
   const fallback = setTimeout(() => {
-    if (document.visibilityState === 'visible') window.location.href = whatsappUrl(text);
+    if (document.visibilityState === 'visible') window.location.href = whatsappUrl(text, phone);
   }, 1500);
   document.addEventListener('visibilitychange', () => clearTimeout(fallback), { once: true });
-  window.location.href = `whatsapp://send?${waQuery(text)}`;
+  window.location.href = `whatsapp://send?${waQuery(text, phone)}`;
   return true;
 }
 
@@ -75,3 +77,5 @@ export const nav = [
   { label: 'Services', href: '/#services' },
   { label: 'Contact', href: '/#contact' },
 ];
+
+export const creatorPhone = site.creatorWhatsapp.replace(/\D/g, '');
