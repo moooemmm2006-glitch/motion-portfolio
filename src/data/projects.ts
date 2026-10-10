@@ -14,6 +14,60 @@ const media = (slug: string) => ({
 
 export const projects: Project[] = [
   {
+    // Real client work
+    slug: 'look-good-online',
+    title: 'Look Good Online',
+    client: 'Social content platform · Australia',
+    category: 'commercials',
+    year: 2026,
+    role: 'Editor & Motion Designer',
+    duration: '0:28',
+    tools: ['After Effects', 'Premiere Pro'],
+    deliverables: ['Product promo 16:9', 'Kinetic typography', 'UI animation'],
+    summary: 'A product promo for a social media platform built for Australian financial advisors and mortgage brokers.',
+    challenge:
+      'Explain a content tool for a cautious, compliance-heavy audience in under 30 seconds, without it feeling like another dry fintech ad.',
+    approach:
+      'Cut the founder-style talking head to the rhythm of the voiceover, then lifted the key lines into kinetic serif-and-sans typography, framed the footage in floating glass cards over soft violet gradients, and animated the product UI (approvals, scheduling, post previews) so the tool explains itself.',
+    result: 'A calm, premium 28-second spot that shows the whole workflow, from idea to published post, in one clear story.',
+    accent: '#7B5CFF',
+    preview: '/videos/look-good-online-preview.mp4',
+    poster: '/posters/look-good-online.jpg',
+    video: { type: 'file', src: '/videos/look-good-online.mp4', poster: '/posters/look-good-online.jpg' },
+    gallery: [
+      { src: '/bts/look-good-online-1.jpg', alt: 'Talking head framed in a glass card with kinetic type' },
+      { src: '/bts/look-good-online-2.jpg', alt: 'Callout chips animating beside the footage' },
+      { src: '/bts/look-good-online-3.jpg', alt: 'Animated product UI with scheduled posts' },
+    ],
+  },
+  {
+    // Real client work
+    slug: 'gojiberry-ai-gtm',
+    title: 'Your AI Go-To-Market Team',
+    client: 'Gojiberry',
+    category: 'motion-graphics',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '1:05',
+    tools: ['After Effects', 'Illustrator'],
+    deliverables: ['Product launch film 16:9', 'UI animation', 'Kinetic typography'],
+    summary: 'A one-minute UI-driven launch film for Gojiberry, an AI agent that finds prospects and runs outbound for SaaS teams.',
+    challenge:
+      'Show an invisible AI workflow (finding leads, scoring intent, writing outreach) in a way founders understand at a glance, without a single live-action shot.',
+    approach:
+      'Built the story from the product itself: a prompt being typed, LinkedIn conversations sliding in, prospects flying into a launch and intent signals branching off with clean connector lines. Warm coral accents and soft depth of field keep a white UI feeling premium and alive.',
+    result: 'A crisp launch film that walks through the full go-to-market flow in about a minute and ends on a clean brand lockup.',
+    accent: '#FF6B3D',
+    preview: '/videos/gojiberry-ai-gtm-preview.mp4',
+    poster: '/posters/gojiberry-ai-gtm.jpg',
+    video: { type: 'file', src: '/videos/gojiberry-ai-gtm.mp4', poster: '/posters/gojiberry-ai-gtm.jpg' },
+    gallery: [
+      { src: '/bts/gojiberry-ai-gtm-1.jpg', alt: 'LinkedIn conversation UI animating in' },
+      { src: '/bts/gojiberry-ai-gtm-2.jpg', alt: 'Prospects flying into the launch moment' },
+      { src: '/bts/gojiberry-ai-gtm-3.jpg', alt: 'Intent signals, lead scoring and AI outreach branching off' },
+    ],
+  },
+  {
     slug: 'neon-pulse',
     title: 'Neon Pulse',
     client: 'Kinetic',

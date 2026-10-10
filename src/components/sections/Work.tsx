@@ -11,7 +11,6 @@ import { t } from '@/data/dictionary';
 import type { Category } from '@/data/types';
 import { useCanUse3D } from '@/hooks/useCanUse3D';
 import { useIsMobile } from '@/hooks/useReducedMotion';
-import { useLenis } from '@/components/providers/SmoothScroll';
 import { usePageTransition } from '@/components/providers/TransitionProvider';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { TransitionLink } from '@/components/ui/TransitionLink';
@@ -23,14 +22,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 const WorkGallery = dynamic(() => import('@/components/three/WorkGallery'), { ssr: false });
 
-/** Scroll distance (in viewport heights) per project in the 3D ring. */
-const VH_PER_CARD = 45;
+/** How far (in cards) the ring turns while the section scrolls past, for a little parallax. */
+const SCROLL_TURN = 1.2;
 
 export function Work() {
   const can3D = useCanUse3D();
   const mobile = useIsMobile();
   const navigate = usePageTransition();
-  const lenis = useLenis();
   const [filter, setFilter] = useState<Category | 'all'>('all');
   const [view, setView] = useState<'3d' | 'grid'>('3d');
   const [focused, setFocused] = useState(projects[0].slug);
@@ -39,62 +37,64 @@ export function Work() {
   const track = useRef<HTMLDivElement>(null);
   const index = useRef(0);
   const dragged = useRef(false);
-  const st = useRef<ScrollTrigger | null>(null);
+  // the ring's front card = what the visitor picked (drag/arrows) + a small scroll-driven offset
+  const picked = useRef(0);
+  const scrollOff = useRef(0);
 
   const shown = useMemo(() => projects.filter((p) => filter === 'all' || p.category === filter), [filter]);
   const visible = useMemo(() => new Set(shown.map((p) => p.slug)), [shown]);
   const is3D = can3D && view === '3d';
+  const last = Math.max(0, shown.length - 1);
 
+  const apply = useCallback(() => {
+    index.current = Math.min(last, Math.max(0, picked.current + scrollOff.current));
+  }, [last]);
+
+  // The page scrolls normally; passing the section only nudges the ring, it never holds the scroll.
   useEffect(() => {
     if (!is3D || !track.current) return;
-    const n = shown.length;
-    st.current = ScrollTrigger.create({
-      trigger: track.current,
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: (self) => (index.current = self.progress * Math.max(0, n - 1)),
-    });
-    // render while the section is anywhere near the viewport
-    const near = ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: track.current,
       start: 'top bottom',
       end: 'bottom top',
       onToggle: (self) => setActive(self.isActive),
+      onUpdate: (self) => {
+        scrollOff.current = (self.progress - 0.5) * SCROLL_TURN;
+        apply();
+      },
     });
     ScrollTrigger.refresh();
-    return () => {
-      st.current?.kill();
-      near.kill();
-    };
-  }, [is3D, shown.length]);
+    return () => st.kill();
+  }, [is3D, apply]);
 
-  const scrollToIndex = useCallback(
-    (i: number, immediate = false) => {
-      const s = st.current;
-      if (!s) return;
-      const n = Math.max(1, shown.length - 1);
-      const y = s.start + (s.end - s.start) * (Math.min(Math.max(i, 0), n) / n);
-      if (lenis) lenis.scrollTo(y, { immediate, duration: 1.2 });
-      else window.scrollTo({ top: y, behavior: immediate ? 'auto' : 'smooth' });
+  const goTo = useCallback(
+    (i: number) => {
+      // pick a card so that, with the current scroll offset, it lands in front
+      const target = Math.min(last, Math.max(0, Math.round(i)));
+      picked.current = target - scrollOff.current;
+      apply();
     },
-    [lenis, shown.length],
+    [apply, last],
   );
 
-  // Horizontal drag/swipe on the ring is translated into page scroll.
-  const drag = useRef({ x: 0, startIndex: 0, down: false });
+  // Horizontal drag/swipe turns the ring directly; vertical swipes still scroll the page.
+  const drag = useRef({ x: 0, start: 0, down: false });
   const onPointerDown = (e: React.PointerEvent) => {
-    drag.current = { x: e.clientX, startIndex: index.current, down: true };
+    drag.current = { x: e.clientX, start: picked.current, down: true };
     dragged.current = false;
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag.current.down) return;
     const dx = e.clientX - drag.current.x;
     if (Math.abs(dx) > 6) dragged.current = true;
-    if (dragged.current) scrollToIndex(drag.current.startIndex - dx / (mobile ? 220 : 380), true);
+    if (dragged.current) {
+      picked.current = drag.current.start - dx / (mobile ? 220 : 380);
+      apply();
+    }
   };
   const onPointerUp = () => {
+    if (drag.current.down && dragged.current) goTo(index.current);
     drag.current.down = false;
-    if (dragged.current) scrollToIndex(Math.round(index.current));
     setTimeout(() => (dragged.current = false), 0);
   };
 
@@ -103,11 +103,8 @@ export function Work() {
 
   const changeFilter = (id: Category | 'all') => {
     setFilter(id);
-    if (is3D && st.current) {
-      const top = st.current.start;
-      if (lenis) lenis.scrollTo(top, { duration: 0.8 });
-      else window.scrollTo({ top });
-    }
+    picked.current = -scrollOff.current;
+    apply();
   };
 
   return (
@@ -159,8 +156,8 @@ export function Work() {
       </div>
 
       {is3D ? (
-        <div ref={track} className="relative" style={{ height: `${100 + Math.max(0, shown.length - 1) * VH_PER_CARD}vh` }}>
-          <div className="sticky top-0 h-[100svh] overflow-hidden">
+        <div ref={track} className="relative">
+          <div className="relative h-[100svh] overflow-hidden">
             <div
               className="absolute inset-0 touch-pan-y"
               onPointerDown={onPointerDown}
@@ -205,10 +202,10 @@ export function Work() {
                   )}
                 </AnimatePresence>
                 <div className="pointer-events-auto flex items-center gap-2">
-                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Previous project" onClick={() => scrollToIndex(focusedIdx - 1)}>
+                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Previous project" onClick={() => goTo(focusedIdx - 1)}>
                     ←
                   </button>
-                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Next project" onClick={() => scrollToIndex(focusedIdx + 1)}>
+                  <button className="btn-ghost h-12 w-12 justify-center p-0" aria-label="Next project" onClick={() => goTo(focusedIdx + 1)}>
                     →
                   </button>
                   {focusedProject && (

@@ -9,7 +9,7 @@ import { cineInOut, expoOut } from '@/lib/easing';
 import { cn } from '@/lib/utils';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
-import { BrandName, WhatsAppIcon, WhatsAppLink } from './Brand';
+import { WhatsAppIcon, WhatsAppLink } from './Brand';
 
 export function Navbar() {
   const [hidden, setHidden] = useState(false);
@@ -48,7 +48,8 @@ export function Navbar() {
       >
         <nav className="container-x flex h-20 items-center justify-between" aria-label="Main">
           <TransitionLink href="/" className="font-display text-lg font-bold tracking-tight" transitionLabel="Home">
-            <BrandName badgeClassName="text-[1.35em]" />
+            {site.name}
+            <span className="text-violet-soft">.</span>
           </TransitionLink>
 
           <ul className="hidden items-center gap-1 md:flex">

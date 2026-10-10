@@ -3,37 +3,10 @@
 import Image from 'next/image';
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion';
 import { useState } from 'react';
-import { clients } from '@/data/clients';
 import { testimonials } from '@/data/testimonials';
 import { t } from '@/data/dictionary';
-import type { Client } from '@/data/types';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { expoOut } from '@/lib/easing';
-
-function LogoRow({ items, reverse }: { items: Client[]; reverse?: boolean }) {
-  const doubled = [...items, ...items];
-  return (
-    <div className="marquee-pause flex overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
-      <ul className={reverse ? 'animate-marquee-reverse flex shrink-0 gap-4' : 'animate-marquee flex shrink-0 gap-4'} style={{ ['--marquee-duration' as string]: '45s' }}>
-        {doubled.map((c, i) => (
-          <li
-            key={`${c.name}-${i}`}
-            aria-hidden={i >= items.length}
-            className="group flex h-24 w-56 shrink-0 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.02] transition-colors duration-500 hover:border-white/20 md:h-28 md:w-64"
-          >
-            <Image
-              src={c.logo}
-              alt={c.name}
-              width={180}
-              height={40}
-              className="h-8 w-auto opacity-50 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0"
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 function Testimonials() {
   const [order, setOrder] = useState(testimonials.map((_, i) => i));
@@ -100,22 +73,13 @@ function Testimonials() {
 }
 
 export function Clients() {
-  const half = Math.ceil(clients.length / 2);
   return (
     <section id="clients" className="relative overflow-hidden py-28 md:py-40" aria-labelledby="clients-title">
       <div className="container-x">
         <SectionHeading id="clients-title" index="03" eyebrow={t.clients.eyebrow} title={t.clients.heading} />
       </div>
 
-      {/* Two rows in opposite directions, tilted in 3D perspective */}
-      <div className="[perspective:1400px]">
-        <div className="space-y-4 [transform:rotateX(18deg)_rotateZ(-4deg)_scale(1.08)] [transform-style:preserve-3d]">
-          <LogoRow items={clients.slice(0, half)} />
-          <LogoRow items={clients.slice(half)} reverse />
-        </div>
-      </div>
-
-      <div className="container-x mt-32">
+      <div className="container-x mt-8">
         <Testimonials />
       </div>
     </section>

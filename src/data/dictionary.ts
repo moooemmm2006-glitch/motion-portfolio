@@ -13,7 +13,7 @@ export const en = {
     view3d: '3D',
     viewGrid: 'Grid',
     empty: 'No projects in this category yet.',
-    dragHint: 'Drag or scroll to browse',
+    dragHint: 'Drag or use the arrows to browse',
   },
   clients: { eyebrow: 'Clients', heading: 'Trusted by brands that move.', testimonials: 'Kind words' },
   services: { eyebrow: 'Services', heading: 'What I can make for you.', process: 'How I work' },

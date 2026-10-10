@@ -15,7 +15,6 @@ import { Magnetic } from '@/components/ui/Magnetic';
 import { SplitText } from '@/components/ui/SplitText';
 import { expoOut } from '@/lib/easing';
 import { blip } from '@/lib/sound';
-import { AeBadge } from '@/components/ui/Brand';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -82,17 +81,7 @@ export function Hero() {
         </motion.p>
 
         <h1 className="display max-w-[12ch] text-[clamp(3.5rem,11vw,11rem)]">
-          <span className="block">
-            <SplitText text={site.name} by="chars" trigger="manual" play={loaded} delay={0.15} className="inline" />
-            <motion.span
-              className="relative -top-[0.08em] ml-[0.15em] inline-flex align-middle"
-              initial={{ opacity: 0, scale: 0.4, rotate: -20 }}
-              animate={loaded ? { opacity: 1, scale: 1, rotate: 0 } : {}}
-              transition={{ delay: 0.75, duration: 1, ease: expoOut }}
-            >
-              <AeBadge className="text-[0.42em]" />
-            </motion.span>
-          </span>
+          <SplitText text={site.name} by="chars" trigger="manual" play={loaded} delay={0.15} className="block" />
         </h1>
         <p className="mt-4 max-w-xl font-display text-[clamp(1.25rem,2.4vw,2rem)] leading-tight tracking-tight">
           <SplitText text={site.title} trigger="manual" play={loaded} delay={0.5} className="block" />

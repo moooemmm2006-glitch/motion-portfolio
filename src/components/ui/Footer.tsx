@@ -7,7 +7,7 @@ import { t } from '@/data/dictionary';
 import { useScrollTo } from '@/components/providers/SmoothScroll';
 import { Magnetic } from './Magnetic';
 import { TransitionLink } from './TransitionLink';
-import { BrandName, WhatsAppLink } from './Brand';
+import { WhatsAppLink } from './Brand';
 
 export function Footer() {
   const scrollTo = useScrollTo();
@@ -18,9 +18,7 @@ export function Footer() {
       <div className="container-x">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           <div>
-            <p className="display text-[clamp(2.5rem,6vw,5rem)]">
-              <BrandName badgeClassName="text-[0.6em]" />
-            </p>
+            <p className="display text-[clamp(2.5rem,6vw,5rem)]">{site.name}</p>
             <p className="mt-3 max-w-sm text-paper/60">
               {site.title} · {site.specialty}
             </p>
