@@ -10,7 +10,7 @@ export const site = {
   specialty: 'After Effects Specialist',
   tagline: 'I turn raw footage into stories that move.',
   bio: [
-    "I'm a video editor and motion designer obsessed with rhythm, timing and the frame-perfect cut. For the past 2 years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
+    "I'm a video editor and motion designer who truly loves editing videos, from rhythm and timing to the frame-perfect cut. For the past 2 years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
     'After Effects is my home base. From kinetic typography and logo reveals to full commercial edits, compositing and color, I handle the whole pipeline so your story ships polished.',
   ],
   availability: 'Available for remote work worldwide',

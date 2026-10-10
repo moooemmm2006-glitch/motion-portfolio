@@ -9,6 +9,11 @@ interface Props {
   title: string;
   autoPlay?: boolean;
   className?: string;
+  /** Start with sound off (defaults to autoPlay, since browsers block unmuted autoplay). */
+  startMuted?: boolean;
+  /** When set, the video plays once and calls this at the end instead of looping. */
+  onEnded?: () => void;
+  onMuteChange?: (muted: boolean) => void;
 }
 
 const fmt = (s: number) => {
@@ -22,7 +27,7 @@ const fmt = (s: number) => {
  * One player for every source: MP4/WebM files, HLS (.m3u8 via hls.js, loaded on demand),
  * Vimeo and YouTube embeds. File/HLS sources get custom cinematic controls.
  */
-export function VideoPlayer({ source, title, autoPlay = false, className }: Props) {
+export function VideoPlayer({ source, title, autoPlay = false, className, startMuted, onEnded, onMuteChange }: Props) {
   if (source.type === 'vimeo' || source.type === 'youtube') {
     const src =
       source.type === 'vimeo'
@@ -41,14 +46,18 @@ export function VideoPlayer({ source, title, autoPlay = false, className }: Prop
       </div>
     );
   }
-  return <NativePlayer source={source} title={title} autoPlay={autoPlay} className={className} />;
+  return <NativePlayer source={source} title={title} autoPlay={autoPlay} className={className} startMuted={startMuted} onEnded={onEnded} onMuteChange={onMuteChange} />;
 }
 
-function NativePlayer({ source, title, autoPlay, className }: Props & { source: Extract<VideoSource, { type: 'file' | 'hls' }> }) {
+function NativePlayer({ source, title, autoPlay, className, startMuted, onEnded, onMuteChange }: Props & { source: Extract<VideoSource, { type: 'file' | 'hls' }> }) {
   const wrap = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(!!autoPlay);
+  const [muted, setMutedState] = useState(startMuted ?? !!autoPlay);
+  const setMuted = (m: boolean) => {
+    setMutedState(m);
+    onMuteChange?.(m);
+  };
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -61,6 +70,13 @@ function NativePlayer({ source, title, autoPlay, className }: Props & { source: 
     if (!el) return;
     if (source.type !== 'hls' || el.canPlayType('application/vnd.apple.mpegurl')) {
       el.src = source.src;
+      // Unmuted autoplay can be blocked; fall back to muted so playback still starts.
+      if (autoPlay)
+        el.play().catch(() => {
+          el.muted = true;
+          setMuted(true);
+          void el.play();
+        });
       return;
     }
     let destroy = () => {};
@@ -136,7 +152,8 @@ function NativePlayer({ source, title, autoPlay, className }: Props & { source: 
         muted={muted}
         autoPlay={autoPlay}
         preload="metadata"
-        loop
+        loop={!onEnded}
+        onEnded={onEnded}
         onClick={toggle}
         onPlay={() => {
           setPlaying(true);
