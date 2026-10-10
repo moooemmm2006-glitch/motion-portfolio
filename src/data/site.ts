@@ -10,7 +10,7 @@ export const site = {
   specialty: 'After Effects Specialist',
   tagline: 'I turn raw footage into stories that move.',
   bio: [
-    "I'm a video editor and motion designer obsessed with rhythm, timing and the frame-perfect cut. For the past [X] years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
+    "I'm a video editor and motion designer obsessed with rhythm, timing and the frame-perfect cut. For the past 2 years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
     'After Effects is my home base. From kinetic typography and logo reveals to full commercial edits, compositing and color, I handle the whole pipeline so your story ships polished.',
   ],
   availability: 'Available for remote work worldwide',
@@ -31,10 +31,10 @@ export const site = {
     { label: 'TikTok', href: '' },
   ] as { label: 'Instagram' | 'Facebook' | 'TikTok'; href: string }[],
   stats: [
-    { value: 7, suffix: '+', label: 'Years experience' },
-    { value: 250, suffix: '+', label: 'Projects delivered' },
-    { value: 80, suffix: '+', label: 'Happy clients' },
-    { value: 40, suffix: 'M+', label: 'Views generated' },
+    { value: 2, suffix: '+', label: 'Years experience' },
+    { value: 80, suffix: '+', label: 'Projects delivered' },
+    { value: 50, suffix: '+', label: 'Happy clients' },
+    { value: 20, suffix: 'K+', label: 'Views generated' },
   ],
   tools: [
     { name: 'After Effects', short: 'Ae', color: '#9999FF', main: true },
