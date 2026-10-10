@@ -1,19 +1,13 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { AdaptiveDpr, Environment, Lightformer, PerformanceMonitor, Sparkles, useTexture } from '@react-three/drei';
+import { AdaptiveDpr, Environment, Lightformer, PerformanceMonitor, Sparkles } from '@react-three/drei';
 import { Bloom, ChromaticAberration, EffectComposer, Vignette } from '@react-three/postprocessing';
 import { Suspense, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import * as THREE from 'three';
-import { projects } from '@/data/projects';
-import { lightRayFragment, lightRayVertex } from '@/shaders/lightRay';
 
 type Quality = 'high' | 'low';
 const CA_OFFSET = new THREE.Vector2(0.0008, 0.0005);
-const SPECTRUM = ['#FF3D3D', '#FF6B3D', '#FFB13D', '#00E0B8', '#3D8BFF', '#7B5CFF', '#C45CFF'];
-/** Where the white beam enters and the colours leave (prism-local space). */
-const EXIT = new THREE.Vector3(0.35, 0.05, 0);
-const ENTRY = new THREE.Vector3(-0.55, 0.2, 0);
 
 interface Props {
   /** 0 at top of page, 1 when the hero has scrolled away. */
@@ -38,73 +32,99 @@ function useDeviceTilt(enabled: boolean) {
   return tilt;
 }
 
-function rayMaterial(color: string, phase: number, speed: number) {
-  return new THREE.ShaderMaterial({
-    vertexShader: lightRayVertex,
-    fragmentShader: lightRayFragment,
-    uniforms: {
-      uColor: { value: new THREE.Color(color) },
-      uTime: { value: 0 },
-      uSpeed: { value: speed },
-      uPhase: { value: phase },
-      uIntensity: { value: 1 },
-    },
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    transparent: true,
-    toneMapped: false,
-  });
+/** Hero look: soft violet glass washed with an Instagram-style gradient. */
+const LOOK = {
+  gradient: ['#FEDA75', '#FA7E1E', '#D62976', '#962FBF', '#4F5BD5'],
+  glassOpacity: 0.42,
+  edge: '#C9A8FF',
+  inner: ['rgba(214,41,118,0.45)', 'rgba(150,47,191,0.14)'],
+  halo: ['rgba(150,47,191,0.5)', 'rgba(214,41,118,0.14)'],
+};
+
+/** Diagonal gradient (bottom-left warm → top-right violet) mapped across the button. */
+function gradientTexture(stops: string[]) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d')!;
+  const gr = g.createLinearGradient(0, 256, 256, 0);
+  stops.forEach((col, i) => gr.addColorStop(i / (stops.length - 1), col));
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }
 
-// unit-length cylinder lying along +X, starting at the origin, so scale.x = length
-const RAY_GEO = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true).rotateZ(-Math.PI / 2).translate(0.5, 0, 0);
-const PRISM_GEO = new THREE.CylinderGeometry(1.2, 1.2, 1.7, 3).rotateX(Math.PI / 2);
-const PRISM_EDGES = new THREE.EdgesGeometry(PRISM_GEO);
-const FRAME_GEO = new THREE.PlaneGeometry(1.4, 0.7875);
-const RIM_GEO = new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.46, 0.8475));
+/** Soft radial glow drawn once to a canvas. */
+function glowTexture(inner: string, outer: string) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d')!;
+  const gr = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gr.addColorStop(0, inner);
+  gr.addColorStop(0.5, outer);
+  gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
 
-/** Point a ray from `from` toward angle `a`, `len` long. */
-function placeRay(m: THREE.Object3D, from: THREE.Vector3, a: number, len: number, thick: number) {
-  m.position.copy(from);
-  m.rotation.set(0, 0, a);
-  m.scale.set(len, thick, thick);
+/** The ▶ icon with rounded corners, extruded and bevelled into a glass slab. */
+function playGeometry() {
+  const r = 1.5;
+  const k = 0.14;
+  const pts: [number, number][] = [
+    [-r * 0.55, r],
+    [r * 0.95, 0],
+    [-r * 0.55, -r],
+  ];
+  const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const shape = new THREE.Shape();
+  pts.forEach((a, i) => {
+    const next = pts[(i + 1) % 3];
+    const prev = pts[(i + 2) % 3];
+    const s0 = lerp(a, prev, k);
+    const e0 = lerp(a, next, k);
+    if (i === 0) shape.moveTo(...s0);
+    else shape.lineTo(...s0);
+    shape.quadraticCurveTo(a[0], a[1], ...e0);
+  });
+  shape.closePath();
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.55, bevelEnabled: true, bevelThickness: 0.12, bevelSize: 0.1, bevelSegments: 8, curveSegments: 24 });
+  geo.center();
+  const pos = geo.attributes.position;
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / 3.2 + 0.5, pos.getY(i) / 3.2 + 0.5);
+  return geo;
 }
 
 /**
- * Colour grading made physical: raw white light goes into a glass prism and
- * comes out as a spectrum, each colour landing on a finished piece of work.
+ * A single glass play button: the simplest possible sign for "video", lit from
+ * inside, with a playhead orbiting it like a timeline wrapped into a loop.
  */
-function Prism({ progress, mobile }: { progress: MutableRefObject<number>; mobile: boolean }) {
+function PlayButton({ progress, mobile }: { progress: MutableRefObject<number>; mobile: boolean }) {
   const root = useRef<THREE.Group>(null);
-  const prism = useRef<THREE.Group>(null);
-  const beam = useRef<THREE.Mesh>(null);
-  const beamGlow = useRef<THREE.Mesh>(null);
-  const rays = useRef<(THREE.Mesh | null)[]>([]);
-  const glows = useRef<(THREE.Mesh | null)[]>([]);
-  const frames = useRef<(THREE.Group | null)[]>([]);
-  const core = useRef<THREE.PointLight>(null);
+  const button = useRef<THREE.Group>(null);
+  const orbit = useRef<THREE.Group>(null);
+  const innerGlow = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
   const small = viewport.width < 7;
   const tilt = useDeviceTilt(small);
 
-  const posters = useMemo(() => projects.slice(0, SPECTRUM.length).map((p) => p.poster), []);
-  const textures = useTexture(posters);
-  useMemo(() => textures.forEach((t) => (t.colorSpace = THREE.SRGBColorSpace)), [textures]);
+  const geo = useMemo(playGeometry, []);
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo, 20), [geo]);
+  const gradTex = useMemo(() => gradientTexture(LOOK.gradient), []);
+  const innerTex = useMemo(() => glowTexture(LOOK.inner[0], LOOK.inner[1]), []);
+  const haloTex = useMemo(() => glowTexture(LOOK.halo[0], LOOK.halo[1]), []);
+  const edgeColor = useMemo(() => new THREE.Color(LOOK.edge).multiplyScalar(1.6), []);
+  const dotColor = useMemo(() => new THREE.Color('#FA7E1E').multiplyScalar(3), []);
+  const ringColor = useMemo(() => new THREE.Color('#C9A8FF').multiplyScalar(1.3), []);
 
-  const beamMats = useMemo(() => [rayMaterial('#ffffff', 0, 0.9), rayMaterial('#ffffff', 0, 0.9)], []);
-  const rayMats = useMemo(() => SPECTRUM.map((c, i) => rayMaterial(c, i * 0.137, 0.55)), []);
-  const glowMats = useMemo(() => SPECTRUM.map((c, i) => rayMaterial(c, i * 0.137, 0.55)), []);
-  useEffect(() => {
-    beamMats[1].uniforms.uIntensity.value = 0.18;
-    glowMats.forEach((m) => (m.uniforms.uIntensity.value = 0.16));
-  }, [beamMats, glowMats]);
-
-  // desktop: light travels left → right beside the headline; phone: top → down above it
-  const scale = small ? Math.min(0.28, viewport.width / 7.6) : Math.min(0.56, viewport.width / 17);
-  const baseX = small ? 0 : viewport.width * 0.2;
-  const baseY = small ? viewport.height * 0.335 : -0.05;
-  const baseRotZ = small ? -Math.PI / 2 : 0;
-  const tmp = useMemo(() => new THREE.Vector3(), []);
+  const scale = small ? Math.min(0.5, viewport.width / 6) : Math.min(0.78, viewport.width / 12.5);
+  const baseX = small ? 0 : viewport.width * 0.29;
+  const baseY = small ? viewport.height * 0.27 : 0;
 
   useFrame((state, delta) => {
     const g = root.current;
@@ -114,103 +134,67 @@ function Prism({ progress, mobile }: { progress: MutableRefObject<number>; mobil
     const px = small ? Math.sin(t * 0.45) * 0.6 + tilt.current.x : pointer.x;
     const py = small ? Math.cos(t * 0.35) * 0.5 + tilt.current.y : pointer.y;
 
-    // the whole rig leans toward the cursor; scrolling pulls it toward the camera
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, -0.28 + px * 0.25 + p * 0.6, 2.5, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, 0.12 - py * 0.18, 2.5, delta);
-    g.rotation.z = THREE.MathUtils.damp(g.rotation.z, baseRotZ, 2.5, delta);
-    g.position.x = THREE.MathUtils.damp(g.position.x, baseX, 3, delta);
-    g.position.y = THREE.MathUtils.damp(g.position.y, baseY + p * 0.8, 3, delta);
-    g.position.z = THREE.MathUtils.damp(g.position.z, p * 3.2, 4, delta);
+    g.position.x = THREE.MathUtils.damp(g.position.x, baseX + px * 0.15, 3, delta);
+    g.position.y = THREE.MathUtils.damp(g.position.y, baseY + Math.sin(t * 0.8) * 0.06 + p * 0.8, 3, delta);
+    // scroll: the button flies toward the camera like you're pressing play
+    g.position.z = THREE.MathUtils.damp(g.position.z, p * 3.5, 4, delta);
 
-    // the prism turns slowly; the cursor changes the refraction angle
-    if (prism.current) {
-      prism.current.rotation.z = Math.sin(t * 0.4) * 0.06 + py * 0.08;
-      prism.current.rotation.y = Math.sin(t * 0.3) * 0.25 + px * 0.3;
+    if (button.current) {
+      const b = button.current;
+      b.rotation.y = THREE.MathUtils.damp(b.rotation.y, (small ? -0.25 : -0.45) + px * 0.45 + Math.sin(t * 0.4) * 0.12 + p * 1.6, 2.5, delta);
+      b.rotation.x = THREE.MathUtils.damp(b.rotation.x, 0.1 - py * 0.3, 2.5, delta);
     }
-
-    // incoming white beam
-    const beamLen = 4.8;
-    const beamAngle = -0.12 + Math.sin(t * 0.5) * 0.02;
-    tmp.set(ENTRY.x - Math.cos(beamAngle) * beamLen, ENTRY.y - Math.sin(beamAngle) * beamLen, 0);
-    if (beam.current) placeRay(beam.current, tmp, beamAngle, beamLen, 0.028);
-    if (beamGlow.current) placeRay(beamGlow.current, tmp, beamAngle, beamLen, 0.14);
-    beamMats.forEach((m) => (m.uniforms.uTime.value = t));
-
-    // the fan of colour: wider as you scroll, bent by the cursor
-    const spread = 0.17 + p * 0.12 + Math.sin(t * 0.6) * 0.008;
-    const centre = 0.02 + py * 0.08;
-    const reach = 3.15 + p * 1.5;
-    SPECTRUM.forEach((_, i) => {
-      const a = centre + (3 - i) * spread;
-      const end = tmp.set(EXIT.x + Math.cos(a) * reach, EXIT.y + Math.sin(a) * reach * 1.08, 0);
-      const len = end.distanceTo(EXIT) - 0.78;
-      const ray = rays.current[i];
-      const glow = glows.current[i];
-      const ang = Math.atan2(end.y - EXIT.y, end.x - EXIT.x);
-      if (ray) placeRay(ray, EXIT, ang, len, 0.016);
-      if (glow) placeRay(glow, EXIT, ang, len, 0.09);
-      rayMats[i].uniforms.uTime.value = t;
-      glowMats[i].uniforms.uTime.value = t;
-
-      const f = frames.current[i];
-      if (f) {
-        const bob = Math.sin(t * 0.8 + i * 1.3) * 0.06;
-        f.position.set(end.x, end.y + bob, Math.sin(t * 0.5 + i) * 0.12 + p * (i - 3) * 0.4);
-        // counter the rig's rotation on phones so the work stays upright
-        f.rotation.set(0, -0.35 + px * 0.15, -baseRotZ);
-        f.scale.setScalar(1 + p * 0.25);
-      }
-    });
-
-    if (core.current) core.current.intensity = (small ? 2.5 : 6) + Math.sin(t * 2.2) * 1.5;
+    // the playhead runs around faster as you scroll
+    if (orbit.current) orbit.current.rotation.z -= delta * (0.5 + p * 4);
+    if (innerGlow.current) innerGlow.current.scale.setScalar(1 + Math.sin(t * 1.6) * 0.06);
   });
 
   return (
-    <group ref={root} position={[baseX, baseY, 0]} rotation={[0, 0, baseRotZ]} scale={scale}>
-      <mesh ref={beamGlow} geometry={RAY_GEO} material={beamMats[1]} />
-      <mesh ref={beam} geometry={RAY_GEO} material={beamMats[0]} />
+    <group ref={root} position={[baseX, baseY, 0]} scale={scale}>
+      <mesh position={[0, 0, -2.5]}>
+        <planeGeometry args={[9, 9]} />
+        <meshBasicMaterial map={haloTex} transparent depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
 
-      <group ref={prism}>
-        <mesh geometry={PRISM_GEO}>
+      <group ref={button}>
+        <mesh geometry={geo}>
           <meshPhysicalMaterial
-            color="#d9d4ff"
-            roughness={0.04}
+            map={gradTex}
+            roughness={0.08}
             metalness={0}
             transparent
-            opacity={small ? 0.18 : 0.32}
+            opacity={LOOK.glassOpacity}
             clearcoat={1}
-            iridescence={1}
-            iridescenceIOR={1.6}
-            envMapIntensity={small ? 0.8 : 1.6}
+            iridescence={0.5}
+            iridescenceIOR={1.5}
+            envMapIntensity={1.4}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
         </mesh>
-        <lineSegments geometry={PRISM_EDGES}>
-          <lineBasicMaterial color={new THREE.Color('#ffffff').multiplyScalar(1.7)} toneMapped={false} />
+        <lineSegments geometry={edges}>
+          <lineBasicMaterial color={edgeColor} toneMapped={false} />
         </lineSegments>
-        {/* light dispersing inside the glass */}
-        <pointLight ref={core} color="#bdb3ff" intensity={6} distance={4} />
-        <mesh position={[0, 0.05, 0]}>
-          <sphereGeometry args={[small ? 0.11 : 0.16, 16, 16]} />
-          <meshBasicMaterial color={new THREE.Color('#ffffff').multiplyScalar(small ? 1.5 : 2.2)} toneMapped={false} transparent opacity={0.85} />
+        <mesh ref={innerGlow} position={[0.05, 0, 0]}>
+          <planeGeometry args={[2.4, 2.4]} />
+          <meshBasicMaterial map={innerTex} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
         </mesh>
       </group>
 
-      {SPECTRUM.map((c, i) => (
-        <group key={c}>
-          <mesh ref={(m) => void (glows.current[i] = m)} geometry={RAY_GEO} material={glowMats[i]} />
-          <mesh ref={(m) => void (rays.current[i] = m)} geometry={RAY_GEO} material={rayMats[i]} />
-          <group ref={(m) => void (frames.current[i] = m)}>
-            <mesh geometry={FRAME_GEO}>
-              <meshBasicMaterial map={textures[i]} toneMapped={false} />
-            </mesh>
-            <lineSegments geometry={RIM_GEO}>
-              <lineBasicMaterial color={new THREE.Color(c).multiplyScalar(2)} toneMapped={false} />
-            </lineSegments>
-          </group>
+      {/* timeline ring with a playhead */}
+      <group rotation={[1.2, 0.3, 0]}>
+        <mesh>
+          <torusGeometry args={[2.4, 0.008, 8, 200]} />
+          <meshBasicMaterial color={ringColor} toneMapped={false} />
+        </mesh>
+        <group ref={orbit}>
+          <mesh position={[2.4, 0, 0]}>
+            <sphereGeometry args={[0.07, 16, 16]} />
+            <meshBasicMaterial color={dotColor} toneMapped={false} />
+          </mesh>
         </group>
-      ))}
+      </group>
+      {!mobile && <pointLight position={[-2, 2, 3]} color="#D62976" intensity={20} />}
     </group>
   );
 }
@@ -243,7 +227,7 @@ export default function HeroScene({ progress, active, mobile }: Props) {
       </Environment>
 
       <Suspense fallback={null}>
-        <Prism progress={progress} mobile={mobile} />
+        <PlayButton progress={progress} mobile={mobile} />
       </Suspense>
 
       <Sparkles count={mobile ? 90 : 160} scale={[14, 8, 6]} size={mobile ? 2.5 : 3} speed={0.25} opacity={0.5} color="#bdb3ff" />
