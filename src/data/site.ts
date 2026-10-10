@@ -1,0 +1,57 @@
+import type { VideoSource } from './types';
+
+/**
+ * Everything about you lives here. Replace the [BRACKETED] values.
+ */
+export const site = {
+  name: '[YOUR NAME]',
+  shortName: '[YN]',
+  title: 'Video Editor & Motion Designer',
+  specialty: 'After Effects Specialist',
+  tagline: 'I turn raw footage into stories that move.',
+  bio: [
+    "I'm a video editor and motion designer obsessed with rhythm, timing and the frame-perfect cut. For the past [X] years I've helped brands, artists and studios turn ideas into motion that people actually stop scrolling for.",
+    'After Effects is my home base. From kinetic typography and logo reveals to full commercial edits, compositing and color, I handle the whole pipeline so your story ships polished.',
+  ],
+  location: '[CITY, COUNTRY]',
+  availability: 'Available for remote work worldwide',
+  email: 'hello@example.com',
+  whatsapp: '+10000000000',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com',
+  portrait: '/images/portrait.jpg',
+  showreel: {
+    type: 'file',
+    src: '/videos/showreel.mp4',
+    poster: '/posters/showreel.jpg',
+  } satisfies VideoSource as VideoSource,
+  socials: [
+    { label: 'Instagram', href: 'https://instagram.com/[handle]' },
+    { label: 'Behance', href: 'https://behance.net/[handle]' },
+    { label: 'Vimeo', href: 'https://vimeo.com/[handle]' },
+    { label: 'YouTube', href: 'https://youtube.com/@[handle]' },
+    { label: 'LinkedIn', href: 'https://linkedin.com/in/[handle]' },
+  ],
+  stats: [
+    { value: 7, suffix: '+', label: 'Years experience' },
+    { value: 250, suffix: '+', label: 'Projects delivered' },
+    { value: 80, suffix: '+', label: 'Happy clients' },
+    { value: 40, suffix: 'M+', label: 'Views generated' },
+  ],
+  tools: [
+    { name: 'After Effects', short: 'Ae', color: '#9999FF', main: true },
+    { name: 'Premiere Pro', short: 'Pr', color: '#9999FF' },
+    { name: 'DaVinci Resolve', short: 'Dr', color: '#FF6B3D' },
+    { name: 'Photoshop', short: 'Ps', color: '#31A8FF' },
+    { name: 'Illustrator', short: 'Ai', color: '#FF9A00' },
+    { name: 'Cinema 4D', short: 'C4', color: '#3D8BFF' },
+    { name: 'Element 3D', short: 'E3', color: '#F2F2F2' },
+  ],
+} as const;
+
+export const nav = [
+  { label: 'Work', href: '/#work' },
+  { label: 'About', href: '/#about' },
+  { label: 'Clients', href: '/#clients' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Contact', href: '/#contact' },
+];
