@@ -11,7 +11,7 @@ export const en = {
   waGreeting: "Hi Ahmed, I'd like to talk about a project",
   menu: { open: 'Open menu', close: 'Close menu' },
   hero: { play: 'Show videos', scroll: 'Scroll' },
-  about: { eyebrow: 'About', heading: 'Video Editor & Motion Designer', sub: 'I turn your ideas into videos.', tools: 'Toolkit', mainTool: 'Main tool', portrait: 'Portrait of' },
+  about: { eyebrow: 'About', heading: 'Video Editor & Motion Designer', sub: 'I turn your ideas into videos.', tools: 'Toolkit', mainTool: 'Main tool', portrait: 'Logo of' },
   work: {
     eyebrow: 'Selected Work',
     heading: 'Frames that earned their place.',
@@ -71,7 +71,7 @@ export const ar: Dictionary = {
   waGreeting: 'مرحباً أحمد، أود التحدث معك بخصوص مشروع',
   menu: { open: 'فتح القائمة', close: 'إغلاق القائمة' },
   hero: { play: 'شاهد الأعمال', scroll: 'مرّر' },
-  about: { eyebrow: 'نبذة عني', heading: 'مونتير وصانع موشن جرافيك', sub: 'أحوّل أفكارك إلى فيديوهات.', tools: 'أدواتي', mainTool: 'الأداة الأساسية', portrait: 'صورة' },
+  about: { eyebrow: 'نبذة عني', heading: 'مونتير وصانع موشن جرافيك', sub: 'أحوّل أفكارك إلى فيديوهات.', tools: 'أدواتي', mainTool: 'الأداة الأساسية', portrait: 'شعار' },
   work: {
     eyebrow: 'أعمال مختارة',
     heading: 'كل فريم هنا يستحق مكانه.',
