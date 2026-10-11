@@ -34,7 +34,12 @@ void main() {
   float b = texture2D(uTexture, c - vec2(0.006 * mask, 0.0)).b;
   vec3 col = vec3(r, g, b);
   col += vec3(0.48, 0.36, 1.0) * mask * 0.15;
-  gl_FragColor = vec4(col, 1.0);
+  // rounded corners (radius in UV of the 4:5 plane, aspect-corrected)
+  vec2 q = abs(vUv - 0.5) * vec2(0.8, 1.0);
+  vec2 hb = vec2(0.4, 0.5) - 0.06;
+  float sd = length(max(q - hb, 0.0)) - 0.06;
+  float alpha = 1.0 - smoothstep(-0.002, 0.002, sd);
+  gl_FragColor = vec4(col, alpha);
   #include <colorspace_fragment>
 }
 `;

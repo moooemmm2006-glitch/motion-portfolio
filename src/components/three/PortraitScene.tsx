@@ -44,7 +44,7 @@ function Plane({ src }: { src: string }) {
       onPointerMove={(e) => e.uv && uniforms.uMouse.value.copy(e.uv)}
     >
       <planeGeometry args={[3.2, 4, 64, 64]} />
-      <shaderMaterial vertexShader={portraitVertex} fragmentShader={portraitFragment} uniforms={uniforms} />
+      <shaderMaterial vertexShader={portraitVertex} fragmentShader={portraitFragment} uniforms={uniforms} transparent />
     </mesh>
   );
 }

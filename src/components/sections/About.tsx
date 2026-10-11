@@ -34,7 +34,7 @@ export function About() {
                 <PortraitScene src={site.portrait} active={near} />
               </div>
             ) : (
-              <Image src={site.portrait} alt={`${t.about.portrait} ${site.name}`} fill sizes="(max-width: 1024px) 90vw, 40vw" className="rounded-2xl object-cover" />
+              <Image src={site.portrait} alt={`${t.about.portrait} ${site.name}`} fill sizes="(max-width: 1024px) 90vw, 40vw" className="rounded-[1.75rem] object-cover" />
             )}
             <span className="sr-only">{`${t.about.portrait} ${site.name}`}</span>
           </div>
