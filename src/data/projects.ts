@@ -250,6 +250,33 @@ export const projects: Project[] = [
       { src: '/bts/editors-marketplace-3.jpg', alt: 'Marketplace feed of job cards with rates' },
     ],
   },
+  {
+    // Real client work
+    slug: 'caesar-story',
+    title: 'When Caesar Became a God',
+    client: 'Arabic history storyteller',
+    category: 'social-reels',
+    year: 2026,
+    role: 'Editor & Motion Designer',
+    duration: '0:31',
+    tools: ['Premiere Pro', 'After Effects'],
+    deliverables: ['Vertical reel 9:16', 'Arabic kinetic captions', 'Cinematic AI-generated visuals'],
+    summary: 'An Arabic history reel where a storyteller explains how ancient Rome turned Caesar into a god, and how that idea echoed in the age of Constantine.',
+    challenge:
+      'Bring a dense history lesson to life on short-form video, with no archive footage, and keep a talking head engaging for half a minute.',
+    approach:
+      'Cut the storyteller’s delivery against cinematic red-and-black scenes: a Roman soldier under the moon, a comet over the Colosseum, Caesar framed in a blood-red halo, and a marble statue surrounded by doves. Bold Arabic captions and title cards like “ROMA” and “CAESAR” mark each beat of the story.',
+    result: 'A dramatic, documentary-style reel that makes ancient history feel like a film trailer in about thirty seconds.',
+    accent: '#C1121F',
+    preview: '/videos/caesar-story-preview.mp4',
+    poster: '/posters/caesar-story.jpg',
+    video: { type: 'file', src: '/videos/caesar-story.mp4', poster: '/posters/caesar-story.jpg' },
+    gallery: [
+      { src: '/bts/caesar-story-1.jpg', alt: 'Roman soldier under the moon with the “ROMA” title' },
+      { src: '/bts/caesar-story-2.jpg', alt: 'Marble statue of Caesar surrounded by doves' },
+      { src: '/bts/caesar-story-3.jpg', alt: 'Golden Roman helmet on a red backdrop' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
