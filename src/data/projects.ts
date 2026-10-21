@@ -196,6 +196,33 @@ export const projects: Project[] = [
       { src: '/bts/viral-reel-3.jpg', alt: 'Animated icons over the talking head' },
     ],
   },
+  {
+    // Real client work
+    slug: 'love-of-falsehood',
+    title: 'You Are With Those You Love',
+    client: 'Islamic reminder channel',
+    category: 'social-reels',
+    year: 2026,
+    role: 'Editor & Motion Designer',
+    duration: '0:52',
+    tools: ['Premiere Pro', 'After Effects'],
+    deliverables: ['Vertical reel 9:16', 'Arabic kinetic typography', 'Illustrated character animation'],
+    summary: 'An Arabic reminder reel about the hadith “you will be with those you love”, and what it means to admire people who live far from the truth.',
+    challenge:
+      'Carry a serious spiritual message on short-form platforms without it feeling heavy, and keep it moving for almost a minute with no presenter on camera.',
+    approach:
+      'Opened on a bold red title card, then told the story with an illustrated character whose colour drains as his heart turns, celebrity cut-outs for the people he follows, and close-ups of a Quran app on a phone. Clean white scenes with calligraphy and glowing Arabic type on a deep blue backdrop carry the closing lines.',
+    result: 'A calm, reflective reel that moves through three visual worlds and lands its message clearly in under a minute.',
+    accent: '#C8102E',
+    preview: '/videos/love-of-falsehood-preview.mp4',
+    poster: '/posters/love-of-falsehood.jpg',
+    video: { type: 'file', src: '/videos/love-of-falsehood.mp4', poster: '/posters/love-of-falsehood.jpg' },
+    gallery: [
+      { src: '/bts/love-of-falsehood-1.jpg', alt: 'Red title card with celebrity cut-outs' },
+      { src: '/bts/love-of-falsehood-2.jpg', alt: 'Close-up of a Quran app on a phone' },
+      { src: '/bts/love-of-falsehood-3.jpg', alt: 'Glowing Arabic type on a deep blue backdrop' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
