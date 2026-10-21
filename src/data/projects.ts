@@ -277,6 +277,60 @@ export const projects: Project[] = [
       { src: '/bts/caesar-story-3.jpg', alt: 'Golden Roman helmet on a red backdrop' },
     ],
   },
+  {
+    // Real client work
+    slug: 'loop-app',
+    title: 'Swipe Your Way Home',
+    client: 'Loop · Real estate app',
+    category: 'motion-graphics',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '0:32',
+    tools: ['After Effects', 'Figma'],
+    deliverables: ['App launch film 16:9', 'UI animation', 'Story breakdown'],
+    summary: 'A 32-second launch film for Loop, a swipe-to-explore real estate app, presented with its Hook, Problem, Reveal, Solution and Outro beats laid out on a timeline.',
+    challenge:
+      'Make house hunting feel fun and new for a younger generation, and show how the edit was structured so clients can see the thinking behind every beat.',
+    approach:
+      'Opened on the question “Where do you call home?” over photos of dream houses and a map of listings, then revealed the Loop logo on a warm orange glow. Floating 3D phones, swiping cards, saved collections and a wall of app screens carry the product, before the film closes on real people and the logo lockup.',
+    result: 'A bright, modern app launch film that doubles as a clear case study of how the story was built.',
+    accent: '#FF5A1F',
+    preview: '/videos/loop-app-preview.mp4',
+    poster: '/posters/loop-app.jpg',
+    video: { type: 'file', src: '/videos/loop-app.mp4', poster: '/posters/loop-app.jpg' },
+    gallery: [
+      { src: '/bts/loop-app-1.jpg', alt: '“Home?” hook with floating house photos' },
+      { src: '/bts/loop-app-2.jpg', alt: 'Swipe-to-save listing on a 3D phone' },
+      { src: '/bts/loop-app-3.jpg', alt: '“Let discovery…” headline with a phone and ribbon' },
+    ],
+  },
+  {
+    // Real client work
+    slug: 'iphone-17-pro',
+    title: 'iPhone 17 Pro',
+    client: 'Product showcase',
+    category: 'commercials',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '0:08',
+    tools: ['After Effects'],
+    deliverables: ['Product spot 16:9', 'Web-style UI animation', '3D product reveal'],
+    summary: 'A short product spot that turns an iPhone 17 Pro landing page into motion: colour picker, storage options and a hero camera close-up.',
+    challenge:
+      'Show colours, storage and the hero design in under ten seconds, while keeping it as clean and premium as an Apple product page.',
+    approach:
+      'Started from a minimal web layout with a gradient “Learn more” button, slid the three finishes in, then switched to black for a colour line-up. An animated cursor taps through storage sizes before a final camera close-up under the iPhone 17 Pro title.',
+    result: 'A crisp, premium product loop that works as an ad, a website hero or a social teaser.',
+    accent: '#F07A2E',
+    preview: '/videos/iphone-17-pro-preview.mp4',
+    poster: '/posters/iphone-17-pro.jpg',
+    video: { type: 'file', src: '/videos/iphone-17-pro.mp4', poster: '/posters/iphone-17-pro.jpg' },
+    gallery: [
+      { src: '/bts/iphone-17-pro-1.jpg', alt: 'Web-style layout with three iPhone finishes' },
+      { src: '/bts/iphone-17-pro-2.jpg', alt: 'Cursor selecting a storage size' },
+      { src: '/bts/iphone-17-pro-3.jpg', alt: 'Camera close-up under the iPhone 17 Pro title' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
