@@ -142,6 +142,33 @@ export const projects: Project[] = [
       { src: '/bts/as-clinic-ask-first-3.jpg', alt: 'Stacked gold pills listing what a specialist must know' },
     ],
   },
+  {
+    // Real client work
+    slug: 'world-war-map',
+    title: 'The Map of a War',
+    client: 'News explainer',
+    category: 'motion-graphics',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '0:40',
+    tools: ['After Effects'],
+    deliverables: ['News explainer 16:9', '3D map animation', 'Satellite strike sequence'],
+    summary: 'A 40-second map-driven explainer that walks through an escalating Middle East conflict, from the first strike to the regional fallout.',
+    challenge:
+      'Make a fast-moving news story easy to follow in under a minute, with dates, places and missile ranges that viewers can read at a glance.',
+    approach:
+      'Built a moody paper-texture map with drifting clouds and a glowing amber line style, opened on a glitching date stamp, then dropped to a satellite view for the strike sequence. Animated borders, missile counters, a range HUD and arcing trajectories carry the story across the region in one continuous camera move.',
+    result: 'A cinematic, documentary-style explainer that turns a complex timeline into a clear visual story.',
+    accent: '#F5B53D',
+    preview: '/videos/world-war-map-preview.mp4',
+    poster: '/posters/world-war-map.jpg',
+    video: { type: 'file', src: '/videos/world-war-map.mp4', poster: '/posters/world-war-map.jpg' },
+    gallery: [
+      { src: '/bts/world-war-map-1.jpg', alt: 'Glitching date stamp over a cloudy map' },
+      { src: '/bts/world-war-map-2.jpg', alt: 'Satellite view of the strike sequence' },
+      { src: '/bts/world-war-map-3.jpg', alt: 'Missile count animated over the highlighted map' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
