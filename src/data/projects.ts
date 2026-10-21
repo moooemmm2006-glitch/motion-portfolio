@@ -169,6 +169,33 @@ export const projects: Project[] = [
       { src: '/bts/world-war-map-3.jpg', alt: 'Missile count animated over the highlighted map' },
     ],
   },
+  {
+    // Real client work
+    slug: 'viral-reel',
+    title: 'Stand Out From the Crowd',
+    client: 'Self-improvement creator',
+    category: 'social-reels',
+    year: 2026,
+    role: 'Editor & Motion Designer',
+    duration: '0:30',
+    tools: ['Premiere Pro', 'After Effects'],
+    deliverables: ['Vertical reel 9:16', 'Word-by-word captions', 'Cinematic B-roll inserts'],
+    summary: 'A 30-second talking-head reel built for retention, mixing a creator’s piece to camera with cinematic inserts about standing out and reaching the top 1%.',
+    challenge:
+      'Keep a simple sit-down monologue gripping on TikTok and Reels, where viewers decide in the first second whether to keep watching.',
+    approach:
+      'Opened on a fast money-themed hook and a gritty “bad news” title card, then cut the creator’s talk to the beat with word-by-word captions and yellow highlights. Moody amber B-roll with kinetic type (“How to be unique”, “Top 1%”) breaks up the talk, and animated icons land the final idea.',
+    result: 'A punchy, high-retention reel that keeps changing every few seconds without losing the speaker’s message.',
+    accent: '#F2B705',
+    preview: '/videos/viral-reel-preview.mp4',
+    poster: '/posters/viral-reel.jpg',
+    video: { type: 'file', src: '/videos/viral-reel.mp4', poster: '/posters/viral-reel.jpg' },
+    gallery: [
+      { src: '/bts/viral-reel-1.jpg', alt: 'Creator on camera with word-by-word captions' },
+      { src: '/bts/viral-reel-2.jpg', alt: 'Amber B-roll with “Top 1%” kinetic type' },
+      { src: '/bts/viral-reel-3.jpg', alt: 'Animated icons over the talking head' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
