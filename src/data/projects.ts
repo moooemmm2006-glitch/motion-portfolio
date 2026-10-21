@@ -223,6 +223,33 @@ export const projects: Project[] = [
       { src: '/bts/love-of-falsehood-3.jpg', alt: 'Glowing Arabic type on a deep blue backdrop' },
     ],
   },
+  {
+    // Real client work
+    slug: 'editors-marketplace',
+    title: 'The Freelance Game',
+    client: 'Editors marketplace platform',
+    category: 'motion-graphics',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '0:21',
+    tools: ['After Effects'],
+    deliverables: ['Product promo 4:3', 'UI animation', 'Kinetic typography'],
+    summary: 'A 21-second UI-driven promo for a marketplace that connects video editors with creators who are looking for them.',
+    challenge:
+      'Show both sides of a broken freelance market (editors ignored in cold emails, creators who can’t find anyone) and land the product in about twenty seconds.',
+    approach:
+      'Opened on glitchy kinetic type and a glowing inbox full of unanswered pitches, then flipped to a bright demand curve with creator avatars and stacked client messages. An editor profile card shatters on red before the reveal: a clean Marketplace logo and a scrolling feed of real job cards with rates and Apply buttons.',
+    result: 'A fast, story-led product promo that sets up the problem and the solution in one smooth sequence.',
+    accent: '#4FE3D1',
+    preview: '/videos/editors-marketplace-preview.mp4',
+    poster: '/posters/editors-marketplace.jpg',
+    video: { type: 'file', src: '/videos/editors-marketplace.mp4', poster: '/posters/editors-marketplace.jpg' },
+    gallery: [
+      { src: '/bts/editors-marketplace-1.jpg', alt: 'Glowing inbox full of editor pitches' },
+      { src: '/bts/editors-marketplace-2.jpg', alt: 'Animated demand curve with creator avatars' },
+      { src: '/bts/editors-marketplace-3.jpg', alt: 'Marketplace feed of job cards with rates' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
