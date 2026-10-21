@@ -331,6 +331,35 @@ export const projects: Project[] = [
       { src: '/bts/iphone-17-pro-3.jpg', alt: 'Camera close-up under the iPhone 17 Pro title' },
     ],
   },
+  {
+    // Real client work
+    slug: 'polygoat',
+    title: 'Who Runs the Bots?',
+    client: 'PolyGoat',
+    category: 'motion-graphics',
+    year: 2026,
+    role: 'Motion Designer',
+    duration: '0:32',
+    tools: ['After Effects'],
+    deliverables: ['Product promo 9:16', 'UI animation', 'Kinetic typography'],
+    summary:
+      'A vertical launch promo for PolyGoat, an automated trading bot for Polymarket, built from animated UI cards and fast kinetic type.',
+    challenge:
+      'Explain an automated trading product in about thirty seconds to a scrolling audience, without losing them in charts and jargon.',
+    approach:
+      'Opened on a curiosity hook with Polymarket\'s biggest-win cards and the line "These are bots", then turned the question "Who runs them?" into a code-typing beat that resolves into the PolyGoat logo. Collect and Run screens, the live trading feed and the mobile dashboard were animated as glassy floating cards, closing on "No scripts, no code" and a clear call to action.',
+    result:
+      'A punchy 9:16 promo that moves from hook to product to call to action in one continuous blue visual language, ready for Reels and TikTok.',
+    accent: '#2F6BFF',
+    preview: '/videos/polygoat-preview.mp4',
+    poster: '/posters/polygoat.jpg',
+    video: { type: 'file', src: '/videos/polygoat.mp4', poster: '/posters/polygoat.jpg' },
+    gallery: [
+      { src: '/bts/polygoat-1.jpg', alt: 'Polymarket biggest-win cards' },
+      { src: '/bts/polygoat-2.jpg', alt: 'Live trading feed with the Run step' },
+      { src: '/bts/polygoat-3.jpg', alt: 'No scripts, no code buttons' },
+    ],
+  },
 ];
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
